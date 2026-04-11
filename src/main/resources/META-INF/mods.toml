@@ -1,0 +1,21 @@
+modLoader = "javafml"
+loaderVersion = "[32,)"
+issueTrackerURL = "https://github.com/thelegitdolt/dolt-mod-how/issues"
+license = "https://github.com/thelegitdolt/dolt-mod-how/issues"
+
+[[mods]]
+modId = "doltastic_enchantments"
+version = "${file.jarVersion}"
+authors = "Dolt"
+credits = "Dolt H. Haven"
+displayName = "Doltastic Enchantments"
+description = '''
+        Hello
+    '''
+
+[[dependencies.doltastic_enchantments]]
+    modId = "blueprint"
+    mandatory = true
+    versionRange = "[7.1.0,)"
+    ordering = "AFTER"
+    side = "BOTH"
