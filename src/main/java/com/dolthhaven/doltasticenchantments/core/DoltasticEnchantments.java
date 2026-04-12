@@ -13,7 +13,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @SuppressWarnings("removal")
 @Mod(DoltasticEnchantments.MOD_ID)
 public class DoltasticEnchantments {
@@ -44,7 +43,5 @@ public class DoltasticEnchantments {
 
         boolean client = event.includeClient();
         dataGen.addProvider(client, new DEItemsModelsGen(event));
-
-
     }
 }
