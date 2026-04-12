@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "doltastic_enchantments:item/fairy_dust"
+  }
+}
