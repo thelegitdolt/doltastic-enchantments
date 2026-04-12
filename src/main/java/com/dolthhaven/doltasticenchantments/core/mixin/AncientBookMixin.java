@@ -12,7 +12,9 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +23,11 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import java.util.List;
 
 @Mixin(AncientBook.class)
-public class AncientBookMixin {
+public class AncientBookMixin extends Item {
+    public AncientBookMixin(Properties pProperties) {
+        super(pProperties);
+    }
+
     @WrapOperation(method = "appendHoverText", slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;value()Ljava/lang/Object;"),
             to = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/datacomponent/ReplicatedNBT;isReplicated(Lnet/minecraft/world/item/ItemStack;)Z")
@@ -41,5 +47,10 @@ public class AncientBookMixin {
             instance.add(Component.literal("- ").append(Component.translatable(name)).withStyle(ChatFormatting.GOLD));
         }
         return true;
+    }
+
+    @Override
+    public Rarity getRarity(ItemStack stack) {
+        return BookUtil.getAllStoredEnchantments(stack).size() > 1 ? Rarity.RARE : Rarity.UNCOMMON;
     }
 }
