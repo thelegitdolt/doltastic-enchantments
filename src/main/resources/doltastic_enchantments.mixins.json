@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "doltastic_enchantments.refmap.json",
   "mixins": [
+    "AncientBookMixin",
     "DiggingSpeedEnchantmentMixin",
     "EnchantingTableServerHandlerMixin",
     "PlayerMixin"
