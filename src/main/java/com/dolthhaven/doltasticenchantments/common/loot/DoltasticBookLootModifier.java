@@ -79,7 +79,7 @@ public class DoltasticBookLootModifier extends LootModifier {
 
         for (int i = 0; i < amount; i++) {
             if (copy.isEmpty()) break;
-            sampled.add(copy.remove(random.nextInt(original.size())));
+            sampled.add(copy.remove(random.nextInt(copy.size())));
         }
         return sampled;
     }
