@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core;
 
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
 import com.mojang.logging.LogUtils;
@@ -44,6 +45,7 @@ public class DoltasticEnchantments {
     private void dataSetup(final GatherDataEvent event) {
         DataGenerator dataGen = event.getGenerator();
         boolean server = event.includeServer();
+        dataGen.addProvider(server, new DEEnchantmentTags(event));
 
         boolean client = event.includeClient();
         dataGen.addProvider(client, new DEItemsModelsGen(event));

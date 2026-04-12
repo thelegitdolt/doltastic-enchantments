@@ -74,9 +74,12 @@ public class DoltasticBookLootModifier extends LootModifier {
 
     private static <E> List<E> sample(List<E> original, int amount, RandomSource random) {
         List<E> sampled = new ArrayList<>();
+        List<E> copy = new ArrayList<>(original.size());
+        copy.addAll(original);
+
         for (int i = 0; i < amount; i++) {
-            if (original.isEmpty()) break;
-            sampled.add(original.remove(random.nextInt(original.size())));
+            if (copy.isEmpty()) break;
+            sampled.add(copy.remove(random.nextInt(original.size())));
         }
         return sampled;
     }

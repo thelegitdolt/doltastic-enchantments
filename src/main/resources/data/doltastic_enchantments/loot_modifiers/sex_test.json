@@ -1,0 +1,40 @@
+{
+  "type": "doltastic_enchantments:ancient_book",
+  "conditions": [],
+  "injections": [
+    {
+      "enchantments": [
+        "minecraft:efficiency",
+        "minecraft:fortune",
+        "minecraft:unbreaking",
+        "minecraft:blast_protection",
+        "minecraft:thorns",
+        "minecraft:fire_protection",
+        "minecraft:projectile_protection",
+        "minecraft:aqua_affinity"
+      ],
+      "tables": [
+        "chests/simple_dungeon",
+        "chests/abandoned_mineshaft"
+      ],
+      "weight": 0.9
+    },
+    {
+      "enchantments": [
+        "minecraft:efficiency",
+        "minecraft:fortune",
+        "minecraft:unbreaking",
+        "minecraft:blast_protection",
+        "minecraft:thorns",
+        "minecraft:fire_protection",
+        "minecraft:projectile_protection",
+        "minecraft:aqua_affinity"
+      ],
+      "tables": [
+        "chests/simple_dungeon",
+        "chests/abandoned_mineshaft"
+      ],
+      "weight": 0.9
+    }
+  ]
+}

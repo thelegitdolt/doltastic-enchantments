@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.mixin;
 
 import com.dolthhaven.doltasticenchantments.core.BookUtil;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -51,6 +53,7 @@ public class AncientBookMixin extends Item {
 
     @Override
     public Rarity getRarity(ItemStack stack) {
-        return BookUtil.getAllStoredEnchantments(stack).size() > 1 ? Rarity.RARE : Rarity.UNCOMMON;
+        return BookUtil.getAllStoredEnchantments(stack).size() > 1  ||
+                ForgeRegistries.ENCHANTMENTS.tags().getTag(DETags.Enchantments.TREASURE).contains(ForgeRegistries.ENCHANTMENTS.getValue(AncientBook.getStoredEnchantment(stack).location())) ? Rarity.RARE : Rarity.UNCOMMON;
     }
 }
