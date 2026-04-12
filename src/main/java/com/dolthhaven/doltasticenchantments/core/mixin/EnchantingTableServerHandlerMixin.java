@@ -1,6 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.mixin;
 
-import com.dolthhaven.doltasticenchantments.core.ItemsUtil;
+import com.dolthhaven.doltasticenchantments.core.BookUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -23,6 +23,6 @@ public class EnchantingTableServerHandlerMixin {
                     to = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/networking/server/EnchantingTableServerHandler;isCreativeBookshelfNearby(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/Level;)Z")),
             at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"), remap = false)
     private static <E> boolean DoltasticEnchants$AddEveryEnchantmentOnABook(List<ResourceKey<Enchantment>> list, E e, Operation<Boolean> original, @Local ItemStack book) {
-        return list.addAll(ItemsUtil.getAllStoredEnchantments(book));
+        return list.addAll(BookUtil.getAllStoredEnchantments(book));
     }
 }

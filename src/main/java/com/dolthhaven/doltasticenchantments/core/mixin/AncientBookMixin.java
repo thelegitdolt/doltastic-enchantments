@@ -1,6 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.mixin;
 
-import com.dolthhaven.doltasticenchantments.core.ItemsUtil;
+import com.dolthhaven.doltasticenchantments.core.BookUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -27,9 +27,9 @@ public class AncientBookMixin {
             to = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/datacomponent/ReplicatedNBT;isReplicated(Lnet/minecraft/world/item/ItemStack;)Z")
     ), at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
     private <E> boolean DoltasticEnchantments$RenderEveryEnchantment(List<Component> instance, E e, Operation<Boolean> original, @Local(argsOnly = true) ItemStack book, @Local RegistryAccess access) {
-        List<ResourceKey<Enchantment>> enchants = ItemsUtil.getAllStoredEnchantments(book);
+        List<ResourceKey<Enchantment>> enchants = BookUtil.getAllStoredEnchantments(book);
         if (enchants.size() == 1) return original.call(instance, e);
-        MutableComponent loreText = Component.translatable("lore.immersiveenchanting.ancient_book");
+        MutableComponent loreText = Component.translatable(AncientBook.TRANSLATION_KEY);
         loreText.append(":");
         instance.add(loreText);
         for (ResourceKey<Enchantment> enchantKey : enchants) {

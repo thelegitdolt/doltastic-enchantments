@@ -1,5 +1,8 @@
 package com.dolthhaven.doltasticenchantments.core;
 
+import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
+import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
+import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
 import com.mojang.logging.LogUtils;
 import com.teamabnormals.blueprint.core.util.registry.RegistryHelper;
 import net.minecraft.data.DataGenerator;
@@ -25,6 +28,7 @@ public class DoltasticEnchantments {
         IEventBus bus = context.getModEventBus();
 
         REGISTRY_HELPER.register(bus);
+        DELoot.LOOT_MODIFIERS.register(bus);
 
         bus.addListener(this::commonSetup);
         bus.addListener(this::dataSetup);

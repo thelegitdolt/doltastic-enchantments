@@ -1,5 +1,6 @@
-package com.dolthhaven.doltasticenchantments.core;
+package com.dolthhaven.doltasticenchantments.core.registry;
 
+import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.teamabnormals.blueprint.core.util.item.CreativeModeTabContentsPopulator;
 import com.teamabnormals.blueprint.core.util.registry.ItemSubRegistryHelper;
 import net.minecraft.world.item.CreativeModeTabs;
