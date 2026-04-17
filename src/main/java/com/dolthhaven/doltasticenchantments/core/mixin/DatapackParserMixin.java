@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(DatapackParser.class)
 public class DatapackParserMixin {
-    @Unique private static final String REQUIRE_BOOK = "requireBook";
+    @Unique private static final String REQUIRE_BOOK = "requiresBook";
 
     @ModifyReturnValue(method = "parseJson", at = @At(value = "RETURN"), remap = false)
     private static EnchantmentCost DoltasticEnchantments$AttachBookRequirement(EnchantmentCost original, @Local(ordinal = 0) JsonObject root) {
@@ -33,7 +33,7 @@ public class DatapackParserMixin {
     private static JsonObject DoltasticEnchantments$AttachBookRequirement(JsonObject root, EnchantmentCost cost) {
         boolean requireBook = true;
         if (cost instanceof DefaultEnchantmentHolder defaultEnchantmentHolder) {
-            defaultEnchantmentHolder.setRequiresBook(requireBook);
+            requireBook = defaultEnchantmentHolder.requiresBook();
         }
 
         root.addProperty(REQUIRE_BOOK, requireBook);
