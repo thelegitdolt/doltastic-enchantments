@@ -12,20 +12,32 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(DatapackParser.class)
 public class DatapackParserMixin {
-    @Unique private static final String UNLOCKED_BY_DEFAULT = "unlockedByDefault";
+    @Unique private static final String REQUIRE_BOOK = "requireBook";
 
-    @ModifyReturnValue(method = "parseJson", at = @At(value = "RETURN"))
+    @ModifyReturnValue(method = "parseJson", at = @At(value = "RETURN"), remap = false)
     private static EnchantmentCost DoltasticEnchantments$AttachBookRequirement(EnchantmentCost original, @Local(ordinal = 0) JsonObject root) {
-        boolean unlockedByDefault = false;
+         boolean unlockedByDefault = true;
 
-        if (root.has(UNLOCKED_BY_DEFAULT)) {
-           unlockedByDefault = root.get(UNLOCKED_BY_DEFAULT).getAsBoolean();
+        if (root.has(REQUIRE_BOOK)) {
+           unlockedByDefault = root.get(REQUIRE_BOOK).getAsBoolean();
         }
 
         if (original instanceof DefaultEnchantmentHolder defaultEnchantmentHolder) {
-            defaultEnchantmentHolder.setDefault(unlockedByDefault);
+            defaultEnchantmentHolder.setRequiresBook(unlockedByDefault);
         }
 
         return original;
+    }
+
+    @ModifyReturnValue(method = "toJson", at = @At(value = "RETURN"), remap = false)
+    private static JsonObject DoltasticEnchantments$AttachBookRequirement(JsonObject root, EnchantmentCost cost) {
+        boolean requireBook = true;
+        if (cost instanceof DefaultEnchantmentHolder defaultEnchantmentHolder) {
+            defaultEnchantmentHolder.setRequiresBook(requireBook);
+        }
+
+        root.addProperty(REQUIRE_BOOK, requireBook);
+
+        return root;
     }
 }

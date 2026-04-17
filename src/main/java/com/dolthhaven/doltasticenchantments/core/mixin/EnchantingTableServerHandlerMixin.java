@@ -33,11 +33,11 @@ public class EnchantingTableServerHandlerMixin {
         return list.addAll(BookUtil.getAllStoredEnchantments(book));
     }
 
-    @WrapOperation(method = "checkBookshelvesAndUpdateClient", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/gui/EnchantingTableMenu;setUnlockedEnchantments(Ljava/util/Set;)V"))
+    @WrapOperation(method = "checkBookshelvesAndUpdateClient", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/gui/EnchantingTableMenu;setUnlockedEnchantments(Ljava/util/Set;)V"), remap = false)
     private static void hi(EnchantingTableMenu instance, Set<Holder<Enchantment>> unlockedEnchantments, Operation<Void> original, @Local(argsOnly = true) Level level) {
         EnchantmentUtil.getAllEnchantments(level).forEach(enchantment -> {
             if (EnchantmentCostRegistry.getRegistry(level).getEnchantmentCost(enchantment.key()) instanceof DefaultEnchantmentHolder holder) {
-                if (holder.isDefault()) {
+                if (!holder.requiresBook()) {
                     unlockedEnchantments.add(enchantment);
                 }
             }

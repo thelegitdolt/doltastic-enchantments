@@ -8,15 +8,15 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(EnchantmentCost.class)
 public class EnchantmentCostMixin implements DefaultEnchantmentHolder {
     @Unique
-    private boolean defaultEnchant = false;
+    private boolean requireBook = true;
 
     @Override
-    public boolean isDefault() {
-        return defaultEnchant;
+    public boolean requiresBook() {
+        return requireBook;
     }
 
     @Override
-    public void setDefault(boolean isDefault) {
-        defaultEnchant = isDefault;
+    public void setRequiresBook(boolean isDefault) {
+        requireBook = isDefault;
     }
 }

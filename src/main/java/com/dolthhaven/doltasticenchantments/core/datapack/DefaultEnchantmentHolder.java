@@ -1,7 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.datapack;
 
 public interface DefaultEnchantmentHolder {
-    boolean isDefault();
+    boolean requiresBook();
 
-    void setDefault(boolean isDefault);
+    void setRequiresBook(boolean requiresBook);
 }
