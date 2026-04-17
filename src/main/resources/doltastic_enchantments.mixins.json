@@ -6,8 +6,10 @@
   "mixins": [
     "AncientBookLootModifierMixin",
     "AncientBookMixin",
+    "DatapackParserMixin",
     "DiggingSpeedEnchantmentMixin",
     "EnchantingTableServerHandlerMixin",
+    "EnchantmentCostMixin",
     "PlayerMixin"
   ],
   "client": [],

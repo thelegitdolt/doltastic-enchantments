@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AncientBookLootModifier.class)
 public class AncientBookLootModifierMixin {
-    @Inject(method = "doApply", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "doApply", at = @At("HEAD"), cancellable = true, remap = false)
     private void DoltasticEnchantments$MyLootModifierIsBetter(ObjectArrayList<ItemStack> generatedLoot, LootContext context, CallbackInfoReturnable<ObjectArrayList<ItemStack>> cir) {
         cir.setReturnValue(generatedLoot);
     }
