@@ -6,10 +6,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
-import me.alfie.immersiveenchanting.gui.EnchantingTableMenu;
 import me.alfie.immersiveenchanting.networking.server.EnchantingTableServerHandler;
 import me.alfie.immersiveenchanting.util.EnchantmentUtil;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -18,8 +16,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Slice;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Mixin(EnchantingTableServerHandler.class)
 public class EnchantingTableServerHandlerMixin {
@@ -33,16 +31,17 @@ public class EnchantingTableServerHandlerMixin {
         return list.addAll(BookUtil.getAllStoredEnchantments(book));
     }
 
-    @WrapOperation(method = "checkBookshelvesAndUpdateClient", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/gui/EnchantingTableMenu;setUnlockedEnchantments(Ljava/util/Set;)V"), remap = false)
-    private static void hi(EnchantingTableMenu instance, Set<Holder<Enchantment>> unlockedEnchantments, Operation<Void> original, @Local(argsOnly = true) Level level) {
+    @WrapOperation(method = "checkBookshelvesAndUpdateClient", at = @At(value = "NEW", target = "()Ljava/util/ArrayList;"), remap = false)
+    private static ArrayList<ResourceKey<Enchantment>> hi(Operation<ArrayList<ResourceKey<Enchantment>>> original, @Local(argsOnly = true) Level level) {
+        ArrayList<ResourceKey<Enchantment>> unlockedEnchants = original.call();
         EnchantmentUtil.getAllEnchantments(level).forEach(enchantment -> {
             if (EnchantmentCostRegistry.getRegistry(level).getEnchantmentCost(enchantment.key()) instanceof DefaultEnchantmentHolder holder) {
                 if (!holder.requiresBook()) {
-                    unlockedEnchantments.add(enchantment);
+                    unlockedEnchants.add(enchantment.key());
                 }
             }
         });
-        original.call(instance, unlockedEnchantments);
-    }
 
+        return unlockedEnchants;
+    }
 }
