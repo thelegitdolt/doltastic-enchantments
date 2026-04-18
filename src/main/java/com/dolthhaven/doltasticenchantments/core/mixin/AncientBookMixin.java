@@ -33,7 +33,7 @@ public class AncientBookMixin extends Item {
     @WrapOperation(method = "appendHoverText", slice = @Slice(
             from = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;value()Ljava/lang/Object;"),
             to = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/datacomponent/ReplicatedNBT;isReplicated(Lnet/minecraft/world/item/ItemStack;)Z")
-    ), at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+    ), at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"), remap = false)
     private <E> boolean DoltasticEnchantments$RenderEveryEnchantment(List<Component> instance, E e, Operation<Boolean> original, @Local(argsOnly = true) ItemStack book, @Local RegistryAccess access) {
         List<ResourceKey<Enchantment>> enchants = BookUtil.getAllStoredEnchantments(book);
         if (enchants.size() == 1) return original.call(instance, e);

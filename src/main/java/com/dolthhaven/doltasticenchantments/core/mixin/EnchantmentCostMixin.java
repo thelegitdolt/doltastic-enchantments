@@ -7,8 +7,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(EnchantmentCost.class)
 public class EnchantmentCostMixin implements DefaultEnchantmentHolder {
-    @Unique
-    private boolean requireBook = true;
+    @Unique private boolean requireBook = true;
 
     @Override
     public boolean requiresBook() {

@@ -1,4 +1,4 @@
-package com.dolthhaven.doltasticenchantments.core.mixin.bookenchanting;
+package com.dolthhaven.doltasticenchantments.core.datapack;
 
 import net.minecraft.world.item.ItemStack;
 
