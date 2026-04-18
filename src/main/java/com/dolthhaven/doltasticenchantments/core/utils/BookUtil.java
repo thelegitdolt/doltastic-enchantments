@@ -1,4 +1,4 @@
-package com.dolthhaven.doltasticenchantments.core;
+package com.dolthhaven.doltasticenchantments.core.utils;
 
 import me.alfie.immersiveenchanting.item.ModItems;
 import net.minecraft.core.Holder;

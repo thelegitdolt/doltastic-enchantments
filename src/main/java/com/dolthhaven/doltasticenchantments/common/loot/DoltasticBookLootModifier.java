@@ -1,6 +1,6 @@
 package com.dolthhaven.doltasticenchantments.common.loot;
 
-import com.dolthhaven.doltasticenchantments.core.BookUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

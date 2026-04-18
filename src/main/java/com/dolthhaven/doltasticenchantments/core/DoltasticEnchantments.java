@@ -2,11 +2,13 @@ package com.dolthhaven.doltasticenchantments.core;
 
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
+import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
 import com.mojang.logging.LogUtils;
 import com.teamabnormals.blueprint.core.util.registry.RegistryHelper;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -22,7 +24,7 @@ import org.slf4j.Logger;
 public class DoltasticEnchantments {
     public static final String MOD_ID = "doltastic_enchantments";
     public static final RegistryHelper REGISTRY_HELPER = new RegistryHelper(MOD_ID);
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public DoltasticEnchantments() {
         FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
@@ -30,6 +32,7 @@ public class DoltasticEnchantments {
 
         REGISTRY_HELPER.register(bus);
         DELoot.LOOT_MODIFIERS.register(bus);
+        DEPackets.register();
 
         bus.addListener(this::commonSetup);
         bus.addListener(this::dataSetup);
@@ -49,5 +52,9 @@ public class DoltasticEnchantments {
 
         boolean client = event.includeClient();
         dataGen.addProvider(client, new DEItemsModelsGen(event));
+    }
+
+    public static ResourceLocation rl(String path) {
+        return new ResourceLocation(MOD_ID, path);
     }
 }

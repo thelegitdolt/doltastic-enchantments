@@ -1,6 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.mixin;
 
-import com.dolthhaven.doltasticenchantments.core.BookUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
 import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
