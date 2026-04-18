@@ -10,7 +10,8 @@
     "DiggingSpeedEnchantmentMixin",
     "EnchantingTableServerHandlerMixin",
     "EnchantmentCostMixin",
-    "PlayerMixin"
+    "PlayerMixin",
+    "bookenchanting.EnchantingTabMixin"
   ],
   "client": [],
   "mixinextras": {

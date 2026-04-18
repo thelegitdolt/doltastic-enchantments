@@ -52,6 +52,10 @@ public class ReagentsRegistry {
         return put(new ResourceLocation(enchantment), new ResourceLocation(item));
     }
 
+    public boolean contains(ResourceKey<Enchantment> enchantment) {
+        return register.containsKey(enchantment);
+    }
+
     public Map<ResourceKey<Enchantment>, ResourceKey<Item>> getRegister() {
         return register;
     }

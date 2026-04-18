@@ -10,6 +10,6 @@ public class DEPackets {
     private static int id = 0;
 
     public static void register() {
-        INSTANCE.registerMessage(id++, EnchantmentReagentSyncPacket.class, EnchantmentReagentSyncPacket::encode, EnchantmentReagentSyncPacket::decode, EnchantmentReagentSyncPacket::handle);
+        INSTANCE.registerMessage(id++, EnchantReagentSyncPacket.class, EnchantReagentSyncPacket::encode, EnchantReagentSyncPacket::decode, EnchantReagentSyncPacket::handle);
     }
 }

@@ -13,27 +13,27 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @SuppressWarnings("removal")
-public class EnchantmentReagentSyncPacket {
+public class EnchantReagentSyncPacket {
     private final List<String> enchants;
     private final List<String> items;
 
-    public EnchantmentReagentSyncPacket(List<String> enchants, List<String> items) {
+    public EnchantReagentSyncPacket(List<String> enchants, List<String> items) {
         this.enchants = enchants;
         this.items = items;
     }
 
-    public static void encode(EnchantmentReagentSyncPacket packet, FriendlyByteBuf buf) {
+    public static void encode(EnchantReagentSyncPacket packet, FriendlyByteBuf buf) {
         buf.writeCollection(packet.enchants, FriendlyByteBuf::writeUtf);
         buf.writeCollection(packet.items, FriendlyByteBuf::writeUtf);
     }
 
-    public static EnchantmentReagentSyncPacket decode(FriendlyByteBuf buf) {
+    public static EnchantReagentSyncPacket decode(FriendlyByteBuf buf) {
         List<String> enchants = buf.readList(FriendlyByteBuf::readUtf);
         List<String> items = buf.readList(FriendlyByteBuf::readUtf);
-        return new EnchantmentReagentSyncPacket(enchants, items);
+        return new EnchantReagentSyncPacket(enchants, items);
     }
 
-    public static void handle(EnchantmentReagentSyncPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(EnchantReagentSyncPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         contextSupplier.get().enqueueWork(() -> {
             DoltasticEnchantments.LOGGER.info("EnchantmentReagentSyncPacket packet received on client, syncing...");
             packet.populateClientRegistry();
@@ -56,7 +56,7 @@ public class EnchantmentReagentSyncPacket {
     public static void sync(ServerPlayer player) {
         if (!player.level().isClientSide) {
             Pair<List<String>, List<String>> entryPair = ReagentsRegistry.server().encode();
-            DEPackets.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new EnchantmentReagentSyncPacket(entryPair.getFirst(), entryPair.getSecond()));
+            DEPackets.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new EnchantReagentSyncPacket(entryPair.getFirst(), entryPair.getSecond()));
         }
     }
 }
