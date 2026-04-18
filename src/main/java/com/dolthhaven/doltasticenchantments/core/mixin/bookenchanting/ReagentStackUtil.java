@@ -13,7 +13,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import java.util.List;
 
 public class ReagentStackUtil {
-    public void checkReagentSlotUpdated(EnchantingTableScreen screen, ReagentStackHolder holder) {
+    public static void checkReagentSlotUpdated(EnchantingTableScreen screen, ReagentStackHolder holder) {
         ItemStack stack = screen.getMenu().getSlot(EnchantingTableMenu.SLOTS.COST.ordinal()).getItem();
         if (!ItemStack.isSameItemSameTags(holder.lastReagentStack(), stack)) {
             holder.setReagentStack(stack.copy());
@@ -21,7 +21,7 @@ public class ReagentStackUtil {
         }
     }
 
-    public void onReagentSlotUpdate(EnchantingTableScreen screen, EnchantingTab tab) {
+    public static void onReagentSlotUpdate(EnchantingTableScreen screen, EnchantingTab tab) {
         ItemStack stack = screen.getMenu().getSlot(EnchantingTableMenu.SLOTS.TOOL.ordinal()).getItem();
         if (!stack.is(Items.BOOK)) {
             return;
@@ -41,7 +41,7 @@ public class ReagentStackUtil {
         }
     }
 
-    private List<Holder<Enchantment>> getApplicableEnchants(ItemStack stack) {
+    private static List<Holder<Enchantment>> getApplicableEnchants(ItemStack stack) {
         return List.of();
     }
 }
