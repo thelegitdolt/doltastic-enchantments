@@ -1,5 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.utils;
 
+import com.dolthhaven.doltasticenchantments.common.enchanting.graph.AncientBookBranch;
 import com.dolthhaven.doltasticenchantments.core.datapack.ReagentStackHolder;
 import me.alfie.immersiveenchanting.gui.EnchantingTableMenu;
 import me.alfie.immersiveenchanting.gui.EnchantingTableScreen;
@@ -8,10 +9,8 @@ import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.BranchFactory;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.Node;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.NodeBranch;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.enchanting.EnchantingNode;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.enchanting.EnchantingNodeBranch;
 import me.alfie.immersiveenchanting.util.EnchantmentUtil;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -36,19 +35,43 @@ public class ReagentStackUtil {
         tab.getRenderedNodes().clear();
         tab.setLockHover(false);
 
-        if (!stack.is(Items.BOOK) || reagentStack.isEmpty()) {
+        if (!stack.is(Items.BOOK)) {
             return false;
         }
 
+        screen.getCanvas().setDraggingEnabled(true);
+
+        if (tryAddEnchantNodes(reagentStack, screen, tab)) {
+            return true;
+        }
+
+        addNoReagentBookHint(screen, tab);
+        return true;
+    }
+
+    private static void addNoReagentBookHint(EnchantingTableScreen screen, EnchantingTab tab) {
+        tab.branches.add(new AncientBookBranch(screen, 0, null, false));
+        adjustBranches(screen, tab);
+    }
+
+    private static boolean tryAddEnchantNodes(ItemStack reagentStack, EnchantingTableScreen screen, EnchantingTab tab) {
         List<Holder<Enchantment>> applicableEnchantments = getApplicableEnchants(reagentStack, screen.player.level());
+
+        if (applicableEnchantments.isEmpty())
+            return false;
 
         List<Float> angles = BranchFactory.generateBranchAngles(applicableEnchantments.size());
         int i = 0;
 
         for (Holder<Enchantment> enchantmentHolder : applicableEnchantments) {
-            tab.branches.add(new EnchantingNodeBranch(screen, angles.get(i), enchantmentHolder, 0, true, screen.player));
+            tab.branches.add(new AncientBookBranch(screen, angles.get(i), enchantmentHolder, true));
             ++i;
         }
+        adjustBranches(screen, tab);
+        return true;
+    }
+
+    private static void adjustBranches(EnchantingTableScreen screen, EnchantingTab tab) {
         NodeBranch.calculateNodeAnglesAndStep(screen);
 
         for (NodeBranch branch : tab.branches) {
@@ -58,8 +81,6 @@ public class ReagentStackUtil {
                 node.setScale(EnchantingNode.globalScale);
             }
         }
-
-        return true;
     }
 
     private static List<Holder<Enchantment>> getApplicableEnchants(ItemStack stack, Level level) {

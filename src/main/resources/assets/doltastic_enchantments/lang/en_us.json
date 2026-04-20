@@ -1,3 +1,8 @@
 {
-  "item.doltastic_enchantments.fairy_dust": "Fairy Dust"
+  "item.doltastic_enchantments.fairy_dust": "Fairy Dust",
+
+  "gui.doltastic_enchantments.conjure": "Conjure",
+  "gui.doltastic_enchantments.conjure_description": "Enchant a book with any common enchantment.",
+
+  "gui.doltastic_enchantments.conjuring_hint": "You must use an enchantable item as a reagent to focus arcane energy."
 }

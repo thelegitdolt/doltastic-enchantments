@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -17,7 +18,7 @@ public class DEDatapackEvent {
         EnchantReagentDatapack.DATAPACK.setServer(event.getServer());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void addInModDatapack(AddReloadListenerEvent event) {
         EnchantReagentDatapack.DATAPACK.setAccess(event.getRegistryAccess());
         event.addListener(EnchantReagentDatapack.DATAPACK);

@@ -1,5 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core;
 
+import com.dolthhaven.doltasticenchantments.client.gui.ClientEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
@@ -8,6 +9,7 @@ import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
 import com.mojang.logging.LogUtils;
 import com.teamabnormals.blueprint.core.util.registry.RegistryHelper;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +38,7 @@ public class DoltasticEnchantments {
 
         bus.addListener(this::commonSetup);
         bus.addListener(this::dataSetup);
+        bus.addListener(ClientEvents::registerInternalEnchantingTooltips);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> DEItems::setUpTabEditors);
         MinecraftForge.EVENT_BUS.register(this);
@@ -56,5 +59,9 @@ public class DoltasticEnchantments {
 
     public static ResourceLocation rl(String path) {
         return new ResourceLocation(MOD_ID, path);
+    }
+
+    public static Component translatable(String key) {
+        return Component.translatable(key.formatted(MOD_ID));
     }
 }
