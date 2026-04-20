@@ -34,18 +34,14 @@ public class ReagentStackUtil {
         tab.branches.clear();
         tab.getRenderedNodes().clear();
         tab.setLockHover(false);
-
         if (!stack.is(Items.BOOK)) {
             return false;
         }
 
         screen.getCanvas().setDraggingEnabled(true);
-
-        if (tryAddEnchantNodes(reagentStack, screen, tab)) {
-            return true;
+        if (!tryAddEnchantNodes(reagentStack, screen, tab)) {
+            addNoReagentBookHint(screen, tab);
         }
-
-        addNoReagentBookHint(screen, tab);
         return true;
     }
 
