@@ -1,5 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.utils;
 
+import me.alfie.immersiveenchanting.item.AncientBook;
 import me.alfie.immersiveenchanting.item.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -8,6 +9,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -42,5 +44,17 @@ public class BookUtil {
         }
         stack.getOrCreateTag().put("StoredEnchantments", listtag);
         return stack;
+    }
+
+    public static ItemStack newBookWith(Holder<Enchantment> enchant) {
+        ItemStack stack = new ItemStack(ModItems.ANCIENT_BOOK.get());
+        AncientBook.setStoredEnchantment(stack, enchant);
+        return stack;
+    }
+
+    public static void drop(Player player, ItemStack stack) {
+        if (!player.getInventory().add(stack)) {
+            player.drop(stack,  true);
+        }
     }
 }

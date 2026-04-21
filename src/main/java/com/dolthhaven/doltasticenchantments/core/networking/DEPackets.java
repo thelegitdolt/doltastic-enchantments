@@ -11,5 +11,6 @@ public class DEPackets {
 
     public static void register() {
         INSTANCE.registerMessage(id++, EnchantReagentSyncPacket.class, EnchantReagentSyncPacket::encode, EnchantReagentSyncPacket::decode, EnchantReagentSyncPacket::handle);
+        INSTANCE.registerMessage(id++, ConjurePacket.class, ConjurePacket::encode, ConjurePacket::decode, ConjurePacket::handle);
     }
 }

@@ -10,6 +10,7 @@ import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.Node;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.NodeBranch;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.enchanting.EnchantingNode;
 import me.alfie.immersiveenchanting.util.EnchantmentUtil;
+import me.alfie.immersiveenchanting.util.FxHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -38,6 +39,7 @@ public class ReagentStackUtil {
             return false;
         }
 
+        FxHelper.playEnchantingTableToolSlotSound(screen.player);
         screen.getCanvas().setDraggingEnabled(true);
         if (!tryAddEnchantNodes(reagentStack, screen, tab)) {
             addNoReagentBookHint(screen, tab);
@@ -82,7 +84,8 @@ public class ReagentStackUtil {
     private static List<Holder<Enchantment>> getApplicableEnchants(ItemStack stack, Level level) {
         ItemStack bareStack = new ItemStack(stack.getItem());
         List<Holder.Reference<Enchantment>> enchants =  EnchantmentUtil.getAllEnchantments(level).stream()
-                .filter(enchant -> enchant.get().canEnchant(bareStack))
+                .filter(enchant -> enchant.get().canEnchant(bareStack) &&
+                        EnchantCostUtil.requiresBook(level, enchant.unwrapKey().orElseThrow()))
                 .sorted(Comparator.comparing((holder) -> holder.unwrapKey().orElseThrow().location().toString())).toList();
         return new ArrayList<>(enchants);
     }

@@ -8,12 +8,10 @@ import net.minecraft.world.item.enchantment.Enchantment;
 
 public class AncientBookBranch extends NodeBranch {
     private final Holder<Enchantment> enchantment;
-    private final boolean unlocked;
 
     public AncientBookBranch(EnchantingTableScreen screen, float branchAngle, Holder<Enchantment> enchantment, boolean unlocked) {
         super(screen, branchAngle);
         this.enchantment = enchantment;
-        this.unlocked = unlocked;
 
         this.addNode(new AncientBookNode(NodeType.ELITE, enchantment, unlocked));
     }
