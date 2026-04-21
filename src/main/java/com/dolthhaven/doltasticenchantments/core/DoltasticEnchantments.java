@@ -3,9 +3,11 @@ package com.dolthhaven.doltasticenchantments.core;
 import com.dolthhaven.doltasticenchantments.client.gui.ClientEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DERecipes;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
+import com.dolthhaven.doltasticenchantments.core.registry.DERecipeSerializers;
 import com.mojang.logging.LogUtils;
 import com.teamabnormals.blueprint.core.util.registry.RegistryHelper;
 import net.minecraft.data.DataGenerator;
@@ -34,6 +36,7 @@ public class DoltasticEnchantments {
 
         REGISTRY_HELPER.register(bus);
         DELoot.LOOT_MODIFIERS.register(bus);
+        DERecipeSerializers.RECIPE_SERIALIZERS.register(bus);
         DEPackets.register();
 
         bus.addListener(this::commonSetup);
@@ -52,6 +55,7 @@ public class DoltasticEnchantments {
         DataGenerator dataGen = event.getGenerator();
         boolean server = event.includeServer();
         dataGen.addProvider(server, new DEEnchantmentTags(event));
+        dataGen.addProvider(server, new DERecipes(event));
 
         boolean client = event.includeClient();
         dataGen.addProvider(client, new DEItemsModelsGen(event));

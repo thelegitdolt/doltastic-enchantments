@@ -91,6 +91,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-${project.minecraft}-forge-api:${project.jei}")
     runtimeOnly fg.deobf("mezz.jei:jei-${project.minecraft}-forge:${project.jei}")
 
+    implementation fg.deobf("maven.modrinth:emi:${project.emi}")
     implementation fg.deobf("maven.modrinth:immersive-enchanting:${project.immersiveenchanting}")
 
 

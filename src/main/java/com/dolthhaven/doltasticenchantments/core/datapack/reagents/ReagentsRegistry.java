@@ -56,8 +56,21 @@ public class ReagentsRegistry {
         return register.containsKey(enchantment);
     }
 
+    public boolean containsValue(ResourceKey<Item> item) {
+        return register.containsValue(item);
+    }
+
     public Map<ResourceKey<Enchantment>, ResourceKey<Item>> getRegister() {
         return register;
+    }
+
+    public ResourceKey<Enchantment> getKey(ResourceKey<Item> itemKey) {
+        for (Map.Entry<ResourceKey<Enchantment>, ResourceKey<Item>> entry : register.entrySet()) {
+            if (entry.getValue().equals(itemKey)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public String getName() {
