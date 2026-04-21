@@ -53,7 +53,8 @@ public class AncientBookMixin extends Item {
 
     @Override
     public Rarity getRarity(ItemStack stack) {
-        return BookUtil.getAllStoredEnchantments(stack).size() > 1  ||
-                ForgeRegistries.ENCHANTMENTS.tags().getTag(DETags.Enchantments.TREASURE).contains(ForgeRegistries.ENCHANTMENTS.getValue(AncientBook.getStoredEnchantment(stack).location())) ? Rarity.RARE : Rarity.UNCOMMON;
+        int size = BookUtil.getAllStoredEnchantments(stack).size();
+        if (size == 0) return Rarity.UNCOMMON;
+        return size > 1 || ForgeRegistries.ENCHANTMENTS.tags().getTag(DETags.Enchantments.TREASURE).contains(ForgeRegistries.ENCHANTMENTS.getValue(AncientBook.getStoredEnchantment(stack).location())) ? Rarity.RARE : Rarity.UNCOMMON;
     }
 }

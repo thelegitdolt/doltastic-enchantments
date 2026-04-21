@@ -26,3 +26,10 @@ description = '''
     versionRange = "[4.0.0,)"
     ordering = "AFTER"
     side = "BOTH"
+
+[[dependencies.doltastic_enchantments]]
+    modId = "emi"
+    mandatory = true
+    versionRange = "[1.1.0,)"
+    ordering = "AFTER"
+    side = "BOTH"
