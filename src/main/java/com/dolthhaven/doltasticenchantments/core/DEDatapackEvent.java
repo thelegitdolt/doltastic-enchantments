@@ -1,10 +1,12 @@
 package com.dolthhaven.doltasticenchantments.core;
 
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.EnchantReagentDatapack;
+import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -29,6 +31,19 @@ public class DEDatapackEvent {
         Player var2 = event.getEntity();
         if (var2 instanceof ServerPlayer player) {
             EnchantReagentSyncPacket.sync(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void finalizeCosts(TagsUpdatedEvent event) {
+        ReagentsRegistry server = ReagentsRegistry.server();
+        if (server != null && !server.getRegister().isEmpty()) {
+            server.expandTags();
+        }
+
+        ReagentsRegistry client = ReagentsRegistry.client();
+        if (client != null && !client.getRegister().isEmpty()) {
+            client.expandTags();
         }
     }
 }

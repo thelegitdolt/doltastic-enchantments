@@ -1,20 +1,21 @@
 package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
+import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("removal")
 public class ReagentsRegistry {
@@ -40,6 +41,7 @@ public class ReagentsRegistry {
     }
 
     public BasicIngredient get(ResourceKey<Enchantment> enchantment) {
+        if (!register.containsKey(enchantment)) return BasicIngredient.EMPTY;
         return register.get(enchantment);
     }
 
@@ -89,4 +91,24 @@ public class ReagentsRegistry {
         });
         return Pair.of(enchants, items);
     }
+
+    public void expandTags() {
+        Set<Pair<ResourceKey<Enchantment>, BasicIngredient>> updatedTags = new HashSet<>();
+        for (Iterator<Map.Entry<ResourceKey<Enchantment>, BasicIngredient>> iterator = register.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<ResourceKey<Enchantment>, BasicIngredient> entry = iterator.next();
+            BasicIngredient ingredient = entry.getValue();
+            if (ingredient.isTag()) {
+                Optional<HolderSet.Named<Item>> tags = BuiltInRegistries.ITEM.getTag(ingredient.tag());
+                if (tags.isEmpty() || tags.orElseThrow().size() == 0) {
+                    DoltasticEnchantments.LOGGER.info("Associated empty tag {} as reagent of enchantment {}, this is an error in your scripts", ingredient.tag().location(), entry.getKey());
+                } else {
+                    iterator.remove();
+                    updatedTags.add(Pair.of(entry.getKey(), new BasicIngredient(tags.orElseThrow().stream().map(a -> a.unwrapKey().orElseThrow()).toList(), null)));
+                }
+            }
+        }
+        updatedTags.forEach(pair -> this.put(pair.getFirst(), pair.getSecond()));
+    }
+
+
 }

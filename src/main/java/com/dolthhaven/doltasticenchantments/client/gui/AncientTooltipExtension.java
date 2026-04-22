@@ -31,9 +31,8 @@ public class AncientTooltipExtension implements DescriptionLayoutExtension {
         if (parentTooltip instanceof AncientBookNode.AncientNodeTooltips tooltip) {
             Node textNode = parentTooltip.node;
             if (textNode instanceof AncientBookNode ancientNode) {
-                if (ancientNode.isUnlocked()) {
+                if (ancientNode.isUnlocked() && ancientNode.getEnchantment() != null) {
                     tooltip.setCurrentRenderedCost(NodeTooltip.getCycledElement(tooltip.getValidCosts(), ClientConfig.getItemCarouselSpeed()));
-                    List<CostEntry> validFuels = EnchantmentCost.getRenderableAnyOfCosts(ReagentsRegistry.client().getUnsafe(ancientNode.getEnchantment()).toCostGroup(20));
 
                     description.insertLine(0, new MaterialsDescriptionLine(tooltip));
                     if (tooltip.getCurrentRenderedCost().xpLevels() > 0) {

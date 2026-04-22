@@ -20,7 +20,8 @@ import java.util.List;
 
 @SuppressWarnings("removal")
 public record BasicIngredient(List<ResourceKey<Item>> itemKeys, TagKey<Item> tag) {
-    public static BasicIngredient EMPTY = new BasicIngredient(List.of(), null);
+    public static final BasicIngredient EMPTY = new BasicIngredient(new ArrayList<>(), null);
+
     public boolean test(ItemStack stack, Registry<Item> itemReg) {
         if (isItems() && itemKeys.isEmpty()) return true;
         if (isTag()) {
@@ -53,7 +54,7 @@ public record BasicIngredient(List<ResourceKey<Item>> itemKeys, TagKey<Item> tag
         } else {
             String string = jsonElement.getAsString();
             if (string.startsWith("#")) {
-                return new BasicIngredient(List.of(), TagKey.create(Registries.ITEM, new ResourceLocation(string.substring(1))));
+                return new BasicIngredient(new ArrayList<>(), TagKey.create(Registries.ITEM, new ResourceLocation(string.substring(1))));
             } else {
                 return new BasicIngredient(List.of(ResourceKeyUtil.sitem(string)), null);
             }
@@ -62,7 +63,7 @@ public record BasicIngredient(List<ResourceKey<Item>> itemKeys, TagKey<Item> tag
 
     public static BasicIngredient decode(String bytes) {
         if (bytes.startsWith("#")) {
-            return new BasicIngredient(List.of(), TagKey.create(Registries.ITEM, new ResourceLocation(bytes.substring(1))));
+            return new BasicIngredient(new ArrayList<>(), TagKey.create(Registries.ITEM, new ResourceLocation(bytes.substring(1))));
         } else {
             return new BasicIngredient(Arrays.stream(bytes.substring(1, bytes.length() - 1).split(",")).map(thing ->
                     ResourceKey.create(Registries.ITEM, new ResourceLocation(thing))).toList(), null);
@@ -70,10 +71,7 @@ public record BasicIngredient(List<ResourceKey<Item>> itemKeys, TagKey<Item> tag
     }
 
     public boolean isValid(Registry<Item> registry, ResourceLocation enchantment, ResourceLocation filePath) {
-        if (itemKeys.isEmpty() && isTag() && (registry.getTag(this.tag).isEmpty() || registry.getTag(this.tag).orElseThrow().size() == 0)) {
-            DoltasticEnchantments.LOGGER.info("Tried to associate empty tag {} as reagent to enchantment {} in {}, aborting", this.tag.location(), enchantment, filePath);
-            return false;
-        } else if (!isTag()){
+        if (!isTag()){
             List<ResourceKey<Item>> illegalItems = new ArrayList<>();
             itemKeys.forEach(itemKey -> {
                 if (!registry.containsKey(itemKey)) {
@@ -98,13 +96,5 @@ public record BasicIngredient(List<ResourceKey<Item>> itemKeys, TagKey<Item> tag
 
     public boolean isItems() {
         return tag == null;
-    }
-
-    public CostGroup toCostGroup(int exp) {
-        if (isTag()) {
-            return new CostGroup(List.of(), GroupType.ANY_OF, new CostItemTag(tag.location().toString(), 1, exp));
-        }
-        return new CostGroup(itemKeys.stream().map(key ->
-                (CostDefinition) new CostEntry(key.location().toString(), "", 1, exp)).toList(), GroupType.ANY_OF, null);
     }
 }

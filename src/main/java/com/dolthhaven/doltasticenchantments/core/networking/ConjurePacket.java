@@ -81,7 +81,7 @@ public class ConjurePacket {
     }
 
     private static @NotNull CostDefinition getCost(ResourceKey<Enchantment> enchantKey) {
-        return ReagentsRegistry.server().get(enchantKey).toCostGroup(20);
+        return ReagentsRegistry.server().get(enchantKey).COST_GROUP;
     }
 
 }
