@@ -3,6 +3,7 @@ package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
@@ -18,10 +19,13 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 @SuppressWarnings("removal")
 @ParametersAreNonnullByDefault
@@ -45,14 +49,26 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pathedJsons, ResourceManager resourceManager, ProfilerFiller profiler) {
-        ReagentsRegistry registry = ReagentsRegistry.server();
-        registry.clear();
+        ReagentsRegistry reagentsReg = ReagentsRegistry.server();
+        Registry<Item> itemReg = access.registry(Registries.ITEM).orElse(null);
+        Registry<Enchantment> enchantReg = access.registry(Registries.ENCHANTMENT).orElse(null);
+
+        if (itemReg == null || enchantReg == null) {
+            DoltasticEnchantments.LOGGER.error("Cannot load enchantment reagents; registries are missing");
+            return;
+        }
+
+        reagentsReg.clear();
         for (Map.Entry<ResourceLocation, JsonElement> jsonFile : pathedJsons.entrySet()) {
             for (Map.Entry<String, JsonElement> jsonEntry : jsonFile.getValue().getAsJsonObject().asMap().entrySet()) {
                 ResourceLocation enchant = new ResourceLocation(jsonEntry.getKey()), item = new ResourceLocation(jsonEntry.getValue().getAsString());
-                if (validate(enchant, item, jsonFile.getKey())) {
+
+                boolean shouldPutNew = validateIDs(enchant, item, jsonFile.getKey(), itemReg, enchantReg)
+                        && calculatePriority(reagentsReg, ResourceKeyUtil.enchant(enchant), ResourceKeyUtil.item(item));
+
+                if (shouldPutNew) {
                     DoltasticEnchantments.LOGGER.info("Associating {} enchantment with reagent {}", enchant, item);
-                    registry.put(enchant, item);
+                    reagentsReg.put(enchant, item);
                 }
             }
         }
@@ -79,7 +95,7 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
         access.registry(Registries.ENCHANTMENT).ifPresentOrElse(reg -> reg
             .stream().forEach(enchantment -> {
                 ResourceKey<Enchantment> enchantKey = reg.getResourceKey(enchantment).orElseThrow();
-                if (!ReagentsRegistry.server().contains(enchantKey)) {
+                if (!ReagentsRegistry.server().containsKey(enchantKey)) {
                     boolean isRequireBook = EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));
                     (isRequireBook ? missingList : booklessList).add(enchantKey);
                 }
@@ -102,22 +118,36 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
         return stringBuilder.toString();
     }
 
-    private boolean validate(ResourceLocation enchantKey, ResourceLocation itemKey, ResourceLocation path) {
-        Optional<Registry<Enchantment>> enchantRegMaybe = access.registry(Registries.ENCHANTMENT);
-        Optional<Registry<Item>> itemRegMaybe  = access.registry(Registries.ITEM);
-        MutableBoolean valid = new MutableBoolean(true);
-        enchantRegMaybe.ifPresent(enchantReg -> {
-            itemRegMaybe.ifPresent(itemReg -> {
-                if (!enchantReg.containsKey(enchantKey)) {
-                    DoltasticEnchantments.LOGGER.warn("Unknown enchantment {} read in mapping at path {}", enchantKey, path);
-                    valid.setFalse();
-                }
-                if (!itemReg.containsKey(itemKey)) {
-                    valid.setFalse();
-                    DoltasticEnchantments.LOGGER.warn("Unknown item {} read in mapping at path {}", itemKey, path);
-                }
-            });
-        });
-        return valid.booleanValue();
+    private boolean validateIDs(ResourceLocation enchantKey, ResourceLocation itemKey, ResourceLocation path, Registry<Item> itemReg, Registry<Enchantment> enchantReg) {
+        boolean valid = true;
+        if (!enchantReg.containsKey(enchantKey)) {
+            DoltasticEnchantments.LOGGER.warn("Unknown enchantment {} read in mapping at path {}", enchantKey, path);
+            valid = false;
+        }
+        if (!itemReg.containsKey(itemKey)) {
+            valid = false;
+            DoltasticEnchantments.LOGGER.warn("Unknown item {} read in mapping at path {}", itemKey, path);
+        }
+        return valid;
+    }
+
+    private boolean calculatePriority(ReagentsRegistry reagentReg, ResourceKey<Enchantment> enchantKey, ResourceKey<Item> itemKey) {
+        Predicate<ResourceLocation> isDefaultNamespace = item -> item.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE);
+        ResourceLocation itemLoc = itemKey.location();
+
+        if (!reagentReg.containsKey(enchantKey)) return true;
+
+        ResourceLocation oldItem = reagentReg.get(enchantKey).location();
+        if (isDefaultNamespace.test(oldItem) && !isDefaultNamespace.test(itemLoc)) {
+            reagentReg.getRegister().remove(enchantKey);
+            DoltasticEnchantments.LOGGER.info("Enchantment {} already has a vanilla reagent {} but new reagent {} is modded, overriding", enchantKey, oldItem, itemKey);
+            return true;
+        } else if (isDefaultNamespace.test(oldItem) && isDefaultNamespace.test(itemLoc)) {
+            DoltasticEnchantments.LOGGER.info("Enchantment {} has a non-vanilla reagent {} but new reagent {} is vanilla, not overriding", enchantKey, oldItem, itemKey);
+            return false;
+        } else {
+            DoltasticEnchantments.LOGGER.info("Found two different reagent entries {} and {} for enchantment {}, keeping {}", oldItem, itemKey, enchantKey, itemKey);
+            return true;
+        }
     }
 }

@@ -52,7 +52,7 @@ public class ReagentsRegistry {
         return put(new ResourceLocation(enchantment), new ResourceLocation(item));
     }
 
-    public boolean contains(ResourceKey<Enchantment> enchantment) {
+    public boolean containsKey(ResourceKey<Enchantment> enchantment) {
         return register.containsKey(enchantment);
     }
 
