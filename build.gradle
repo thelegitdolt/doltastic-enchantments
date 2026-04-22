@@ -93,6 +93,7 @@ dependencies {
 
     implementation fg.deobf("maven.modrinth:emi:${project.emi}")
     implementation fg.deobf("maven.modrinth:immersive-enchanting:${project.immersiveenchanting}")
+    implementation fg.deobf("maven.modrinth:reliable-remover:${project.rr}")
 
 
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"

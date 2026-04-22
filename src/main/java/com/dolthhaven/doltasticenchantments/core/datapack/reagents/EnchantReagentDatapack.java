@@ -4,6 +4,7 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
+import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
@@ -97,7 +98,9 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
     public static void logUnreagentedEnchants(RegistryAccess access) {
         List<ResourceKey<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
         access.registry(Registries.ENCHANTMENT).ifPresentOrElse(reg -> reg
-            .stream().forEach(enchantment -> {
+            .stream()
+                .filter(enchantment -> !DoltasticEnchantments.reliableRemover() || !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
+                .forEach(enchantment -> {
                 ResourceKey<Enchantment> enchantKey = reg.getResourceKey(enchantment).orElseThrow();
                 if (!ReagentsRegistry.server().containsKey(enchantKey)) {
                     boolean isRequireBook = EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));

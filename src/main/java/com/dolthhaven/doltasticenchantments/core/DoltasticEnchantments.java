@@ -18,6 +18,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -49,6 +50,10 @@ public class DoltasticEnchantments {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
 
+    }
+
+    public static boolean reliableRemover() {
+        return ModList.get().isLoaded("reliable_remover");
     }
 
     private void dataSetup(final GatherDataEvent event) {
