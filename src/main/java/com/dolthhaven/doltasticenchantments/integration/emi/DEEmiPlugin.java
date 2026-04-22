@@ -13,6 +13,7 @@ import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
 import me.alfie.immersiveenchanting.item.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -60,7 +61,7 @@ public class DEEmiPlugin implements EmiPlugin {
 
     private static EmiIngredient toEmiIngredient(BasicIngredient ingredient, Registry<Item> itemReg) {
         if (ingredient.tag() == null) {
-            return EmiIngredient.of(ingredient.itemKeys().stream().map(itemKey -> EmiStack.of(itemReg.get(itemKey))).collect(Collectors.toList()));
+            return EmiIngredient.of(ingredient.castedCost().stream().map(a -> EmiStack.of(a.asItem())).collect(Collectors.toList()));
         } else {
             return EmiIngredient.of(ingredient.tag());
         }

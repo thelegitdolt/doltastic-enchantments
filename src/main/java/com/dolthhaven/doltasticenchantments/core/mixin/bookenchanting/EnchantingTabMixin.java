@@ -61,7 +61,7 @@ public class EnchantingTabMixin implements ReagentStackHolder {
                 var ingredient = ReagentsRegistry.getRegistry(player.level())
                         .getUnsafe(ancientNode.getEnchantment());
                 if (ingredient != null)
-                    costDef = EnchantmentCost.getRenderableAnyOfCosts(ingredient.toCostGroup(20));
+                    costDef = EnchantmentCost.getRenderableAnyOfCosts(ingredient.cost());
             }
             nodeTooltip = new AncientBookNode.AncientNodeTooltips(ancientNode, this.screen, costDef);
         }

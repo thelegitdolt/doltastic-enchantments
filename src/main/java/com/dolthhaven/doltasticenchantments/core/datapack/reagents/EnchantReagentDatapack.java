@@ -106,9 +106,9 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
             }), () -> DoltasticEnchantments.LOGGER.warn("Could not find registry; this is strange"));
 
         if (!missingList.isEmpty())
-            DoltasticEnchantments.LOGGER.warn("The following enchantments have no associated reagent: {}", EnchantCostUtil.keyListToString(missingList, ", "));
+            DoltasticEnchantments.LOGGER.warn("The following enchantments have no associated reagent: {}", EnchantCostUtil.reduceToString(missingList, ResourceKey::location,  ", "));
         if (!booklessList.isEmpty())
-            DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these don't require books: {}", EnchantCostUtil.keyListToString(booklessList, ", "));
+            DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these don't require books: {}", EnchantCostUtil.reduceToString(booklessList, ResourceKey::location, ", "));
     }
 
 

@@ -1,8 +1,11 @@
 package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
 import com.mojang.datafixers.util.Pair;
+import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
+import me.alfie.immersiveenchanting.datapack.cost.CostGroup;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -63,16 +66,16 @@ public class ReagentsRegistry {
     }
 
     public boolean containsValue(ItemStack stack, RegistryAccess access) {
-        return register.values().stream().anyMatch(ing -> ing.test(stack, access));
+        return register.values().stream().anyMatch(ing -> ing.test(stack));
     }
 
     public Map<ResourceKey<Enchantment>, BasicIngredient> getRegister() {
         return register;
     }
 
-    public ResourceKey<Enchantment> getKey(ItemStack stack, RegistryAccess access) {
+    public ResourceKey<Enchantment> getKey(ItemStack stack) {
         for (Map.Entry<ResourceKey<Enchantment>, BasicIngredient> entry : register.entrySet()) {
-            if (entry.getValue().test(stack, access)) {
+            if (entry.getValue().test(stack)) {
                 return entry.getKey();
             }
         }
@@ -103,7 +106,8 @@ public class ReagentsRegistry {
                     DoltasticEnchantments.LOGGER.info("Associated empty tag {} as reagent of enchantment {}, this is an error in your scripts", ingredient.tag().location(), entry.getKey());
                 } else {
                     iterator.remove();
-                    updatedTags.add(Pair.of(entry.getKey(), new BasicIngredient(tags.orElseThrow().stream().map(a -> a.unwrapKey().orElseThrow()).toList(), null)));
+                    updatedTags.add(Pair.of(entry.getKey(), new BasicIngredient(tags.orElseThrow().stream().map(a ->
+                            EnchantCostUtil.basicCost(a.unwrapKey().orElseThrow().location().toString(), BasicIngredient.ENCHANT_COST)).toList())));
                 }
             }
         }

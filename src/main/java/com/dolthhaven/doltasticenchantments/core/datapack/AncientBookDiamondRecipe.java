@@ -3,10 +3,9 @@ package com.dolthhaven.doltasticenchantments.core.datapack;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.registry.DERecipeSerializers;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -21,6 +20,7 @@ import net.minecraft.world.level.Level;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
+@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class AncientBookDiamondRecipe extends CustomRecipe {
     public AncientBookDiamondRecipe(ResourceLocation id, CraftingBookCategory category) {
@@ -51,7 +51,7 @@ public class AncientBookDiamondRecipe extends CustomRecipe {
         if (enchantments.isEmpty()) return ItemStack.EMPTY;
 
         return BookUtil.newBookWith(enchantments.orElseThrow()
-                .getHolderOrThrow(reagents.getKey(container.getItem(1), access)));
+                .getHolderOrThrow(reagents.getKey(container.getItem(1))));
     }
 
     @Override
