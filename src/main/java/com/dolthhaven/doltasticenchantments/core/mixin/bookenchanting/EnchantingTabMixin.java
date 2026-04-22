@@ -48,11 +48,13 @@ public class EnchantingTabMixin implements ReagentStackHolder {
         reagentStack = ItemStack.EMPTY;
     }
 
+    // adds a check to see if the changed item in the tool slot is an Items.BOOK for conjuring
     @Inject(method = "onToolSlotUpdate", at = @At("HEAD"), cancellable = true, remap = false)
     private void DoltasticEnchantments$updateBookEnchanting(CallbackInfo ci) {
         if (ReagentStackUtil.bookEnchantingUpdate(this.screen, (EnchantingTab) (Object) this, this.screen.getMenu().getCostSlotItem())) ci.cancel();
     }
 
+    // Makes the tooltip for ancient nodes work
     @WrapOperation(method = "renderNodeTooltip", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/util/FxHelper;playNodeHoverSound(Lme/alfie/immersiveenchanting/gui/core/tab/enchanting/node/Node;Lnet/minecraft/world/entity/player/Player;)V"), remap = false)
     private void DoltasticEnchantments$ProcessModNodes(Node pitch, Player player, Operation<Void> original, @Local(argsOnly = true) Node node) {
         if (node instanceof AncientBookNode ancientNode) {

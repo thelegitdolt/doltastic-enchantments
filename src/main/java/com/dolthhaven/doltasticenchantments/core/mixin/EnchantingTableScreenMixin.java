@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class EnchantingTableScreenMixin {
     @Shadow @Final public EnchantingTab enchantingTab;
 
+    // adds a listener for reagent slots, for ancient books
     @Inject(method = "containerTick", at = @At("TAIL"))
     private void DoltasticEnchants$UpdateReagentStack(CallbackInfo ci) {
         ReagentStackUtil.checkReagentSlotUpdated((EnchantingTableScreen) (Object) this, (ReagentStackHolder) this.enchantingTab);

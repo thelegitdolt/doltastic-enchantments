@@ -1,14 +1,17 @@
 package com.dolthhaven.doltasticenchantments.core.utils;
 
 import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
+import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
+import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
 import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
 import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.function.Function;
 
 public class EnchantCostUtil {
@@ -29,6 +32,26 @@ public class EnchantCostUtil {
             }
         }
         return stringBuilder.toString();
+    }
+
+    public static EnchantmentCost createFairyDustCosts(boolean enabled, List<Integer> defaultCosts) {
+        Map<String, CostDefinition> levelCosts = new HashMap<>();
+
+        for (int i = 1; i <= defaultCosts.size(); i++) {
+            int amount = defaultCosts.get(i - 1);
+            CostEntry costEntry = amount == 0 ? CostEntry.EMPTY : new CostEntry(BuiltInRegistries.ITEM.getKey(DEItems.FAIRY_DUST.get()).toString(), "", amount,0);
+            levelCosts.put(String.valueOf(i), costEntry);
+        }
+        return new EnchantmentCost(levelCosts, enabled);
+    }
+
+    public static List<Integer> defaultCosts(int maxLevel) {
+        if (maxLevel == 1) return List.of(2);
+        List<Integer> cost = new ArrayList<>(maxLevel);
+        for (int i = 0; i < maxLevel; i++) {
+            cost.add(i);
+        }
+        return cost;
     }
 
     public static CostEntry basicCost(String item, int xp) {

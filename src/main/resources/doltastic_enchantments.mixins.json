@@ -13,7 +13,9 @@
     "EnchantingTableServerHandlerMixin",
     "EnchantmentCostMixin",
     "PlayerMixin",
-    "bookenchanting.EnchantingTabMixin"
+    "bookenchanting.EnchantingTabMixin",
+    "defaultreagents.DatapackEventsMixin",
+    "defaultreagents.EnchantmentCostDatapackMixin"
   ],
   "client": [
     "EnchantingTableScreenMixin"

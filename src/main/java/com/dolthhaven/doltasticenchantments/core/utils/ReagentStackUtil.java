@@ -32,12 +32,12 @@ public class ReagentStackUtil {
 
     public static boolean bookEnchantingUpdate(EnchantingTableScreen screen, EnchantingTab tab, ItemStack reagentStack) {
         ItemStack stack = screen.getMenu().getSlot(EnchantingTableMenu.SLOTS.TOOL.ordinal()).getItem();
-        tab.branches.clear();
-        tab.getRenderedNodes().clear();
-        tab.setLockHover(false);
         if (!stack.is(Items.BOOK)) {
             return false;
         }
+        tab.branches.clear();
+        tab.getRenderedNodes().clear();
+        tab.setLockHover(false);
 
         FxHelper.playEnchantingTableToolSlotSound(screen.player);
         screen.getCanvas().setDraggingEnabled(true);

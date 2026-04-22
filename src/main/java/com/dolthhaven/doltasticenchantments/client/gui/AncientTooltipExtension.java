@@ -2,14 +2,10 @@ package com.dolthhaven.doltasticenchantments.client.gui;
 
 import com.dolthhaven.doltasticenchantments.common.enchanting.graph.AncientBookNode;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import me.alfie.immersiveenchanting.api.DescriptionLayoutExtension;
 import me.alfie.immersiveenchanting.api.internal.cost.LevelsDescriptionLine;
 import me.alfie.immersiveenchanting.api.internal.cost.MaterialsDescriptionLine;
 import me.alfie.immersiveenchanting.config.ClientConfig;
-import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
-import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
-import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.Node;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.NodeTooltip;
 import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.tooltip.DescriptionLayout;

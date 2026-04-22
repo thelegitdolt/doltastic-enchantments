@@ -1,5 +1,6 @@
-package com.dolthhaven.doltasticenchantments.core;
+package com.dolthhaven.doltasticenchantments.core.events;
 
+import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.EnchantReagentDatapack;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
