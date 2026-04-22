@@ -40,7 +40,7 @@ public class AncientBookDiamondRecipe extends CustomRecipe {
                 container.getItem(7).is(Items.DIAMOND) &&
                 container.getItem(8).is(Items.DIAMOND);
         if (!matches) return false;
-        return ReagentsRegistry.getRegistry(level).containsValue(ResourceKeyUtil.item(BuiltInRegistries.ITEM.getKey(container.getItem(1).getItem())));
+        return ReagentsRegistry.getRegistry(level).containsValue(container.getItem(1), level.registryAccess());
     }
 
     @Override
@@ -50,7 +50,8 @@ public class AncientBookDiamondRecipe extends CustomRecipe {
         Optional<Registry<Enchantment>> enchantments = access.registry(Registries.ENCHANTMENT);
         if (enchantments.isEmpty()) return ItemStack.EMPTY;
 
-        return BookUtil.newBookWith(enchantments.orElseThrow().getHolderOrThrow(reagents.getKey(ResourceKeyUtil.item(BuiltInRegistries.ITEM.getKey(container.getItem(1).getItem())))));
+        return BookUtil.newBookWith(enchantments.orElseThrow()
+                .getHolderOrThrow(reagents.getKey(container.getItem(1), access)));
     }
 
     @Override

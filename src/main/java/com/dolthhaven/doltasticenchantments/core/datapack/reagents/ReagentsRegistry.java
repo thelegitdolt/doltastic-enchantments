@@ -2,9 +2,12 @@ package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 
@@ -18,7 +21,7 @@ public class ReagentsRegistry {
     private static final ReagentsRegistry CLIENT =  new ReagentsRegistry();
     private static final ReagentsRegistry SERVER_REGISTRY =  new ReagentsRegistry();
 
-    private final Map<ResourceKey<Enchantment>, ResourceKey<Item>> register = new HashMap<>();
+    private final Map<ResourceKey<Enchantment>, BasicIngredient> register = new HashMap<>();
 
     public static ReagentsRegistry client() {
         return CLIENT;
@@ -36,37 +39,38 @@ public class ReagentsRegistry {
         return level.isClientSide ? client() : server();
     }
 
-    public ResourceKey<Item> get(ResourceKey<Enchantment> enchantment) {
+    public BasicIngredient get(ResourceKey<Enchantment> enchantment) {
         return register.get(enchantment);
     }
 
-    public ResourceKey<Item> put(ResourceKey<Enchantment> enchantment, ResourceKey<Item> item) {
+    public BasicIngredient getUnsafe(Holder<Enchantment> enchantment) {
+        return register.get(enchantment.unwrapKey().orElseThrow());
+    }
+
+    public BasicIngredient put(ResourceKey<Enchantment> enchantment, BasicIngredient item) {
         return register.put(enchantment, item);
     }
 
-    public ResourceKey<Item> put(ResourceLocation enchantment, ResourceLocation item) {
-        return put(ResourceKeyUtil.enchant(enchantment), ResourceKeyUtil.item(item));
+    public BasicIngredient put(ResourceLocation enchantment, BasicIngredient item) {
+        return put(ResourceKeyUtil.enchant(enchantment), item);
     }
 
-    public ResourceKey<Item> put(String enchantment, String item) {
-        return put(new ResourceLocation(enchantment), new ResourceLocation(item));
-    }
 
     public boolean containsKey(ResourceKey<Enchantment> enchantment) {
         return register.containsKey(enchantment);
     }
 
-    public boolean containsValue(ResourceKey<Item> item) {
-        return register.containsValue(item);
+    public boolean containsValue(ItemStack stack, RegistryAccess access) {
+        return register.values().stream().anyMatch(ing -> ing.test(stack, access));
     }
 
-    public Map<ResourceKey<Enchantment>, ResourceKey<Item>> getRegister() {
+    public Map<ResourceKey<Enchantment>, BasicIngredient> getRegister() {
         return register;
     }
 
-    public ResourceKey<Enchantment> getKey(ResourceKey<Item> itemKey) {
-        for (Map.Entry<ResourceKey<Enchantment>, ResourceKey<Item>> entry : register.entrySet()) {
-            if (entry.getValue().equals(itemKey)) {
+    public ResourceKey<Enchantment> getKey(ItemStack stack, RegistryAccess access) {
+        for (Map.Entry<ResourceKey<Enchantment>, BasicIngredient> entry : register.entrySet()) {
+            if (entry.getValue().test(stack, access)) {
                 return entry.getKey();
             }
         }
@@ -81,7 +85,7 @@ public class ReagentsRegistry {
         List<String> items = new ArrayList<>(register.size()), enchants = new ArrayList<>(register.size());
         register.forEach((enchant, item) -> {
             enchants.add(enchant.location().toString());
-            items.add(item.location().toString());
+            items.add(item.encodeAsString());
         });
         return Pair.of(enchants, items);
     }

@@ -1,7 +1,6 @@
 package com.dolthhaven.doltasticenchantments.common.enchanting.graph;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.networking.ConjurePacket;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
 import me.alfie.immersiveenchanting.datapack.EnchantmentMetadataRegistry;
@@ -13,11 +12,8 @@ import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.NodeType;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -60,7 +56,7 @@ public class AncientBookNode extends Node {
         }
     }
 
-    public Holder<Enchantment> getEnchantment() {
+    public @Nullable Holder<Enchantment> getEnchantment() {
         return enchantment;
     }
 
@@ -69,8 +65,8 @@ public class AncientBookNode extends Node {
     }
 
     public static class AncientNodeTooltips extends NodeTooltip {
-        public AncientNodeTooltips(AncientBookNode node, EnchantingTableScreen screen) {
-            super(node, screen, List.of(costToRender(screen, node)));
+        public AncientNodeTooltips(AncientBookNode node, EnchantingTableScreen screen, List<CostEntry> validCosts) {
+            super(node, screen, validCosts);
             this.tooltipTitle.setTitleText(getTitleText(node));
         }
 
@@ -85,17 +81,17 @@ public class AncientBookNode extends Node {
             return loreText.append(" ").append(Component.translatable(enchantName));
         }
 
-        private static String getReagent(Level level, AncientBookNode node) {
-            if (node.enchantment != null) {
-                ResourceKey<Item> item = ReagentsRegistry.getRegistry(level).get(node.enchantment.unwrapKey().orElseThrow());
-                if (item != null)
-                    return item.location().toString();
-            }
-            return "minecraft:air";
-        }
-
-        public static CostEntry costToRender(EnchantingTableScreen screen, Node node) {
-            return new CostEntry(getReagent(screen.player.level(), (AncientBookNode) node), "", 1, 20);
-        }
+//        private static String getReagent(Level level, AncientBookNode node) {
+//            if (node.enchantment != null) {
+//                ResourceKey<Item> item = ReagentsRegistry.getRegistry(level).get(node.enchantment.unwrapKey().orElseThrow());
+//                if (item != null)
+//                    return item.location().toString();
+//            }
+//            return "minecraft:air";
+//        }
+//
+//        public static CostEntry costToRender(EnchantingTableScreen screen, Node node) {
+//            return new CostEntry(getReagent(screen.player.level(), (AncientBookNode) node), "", 1, 20);
+//        }
     }
 }

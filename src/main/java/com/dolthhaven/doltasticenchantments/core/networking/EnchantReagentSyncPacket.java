@@ -1,11 +1,13 @@
 package com.dolthhaven.doltasticenchantments.core.networking;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+import com.dolthhaven.doltasticenchantments.core.datapack.reagents.BasicIngredient;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
@@ -49,7 +51,7 @@ public class EnchantReagentSyncPacket {
         registry.clear();
 
         for (int i  = 0; i < enchants.size(); i++) {
-            registry.put(new ResourceLocation(enchants.get(i)), new ResourceLocation(items.get(i)));
+            registry.put(new ResourceLocation(enchants.get(i)), BasicIngredient.decode(items.get(i)));
         }
     }
 

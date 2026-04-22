@@ -53,7 +53,7 @@ public class ConjurePacket {
 
     private static void exec(NetworkEvent.Context ctx, String enchantmentString) {
         ServerPlayer player = ctx.getSender();
-        ResourceKey<Enchantment> enchantKey = ResourceKeyUtil.enchant(enchantmentString);
+        ResourceKey<Enchantment> enchantKey = ResourceKeyUtil.senchant(enchantmentString);
         Optional<Registry<Enchantment>> registry = player.level().registryAccess().registry(Registries.ENCHANTMENT);
         if (registry.isEmpty()) return;
 
@@ -81,7 +81,7 @@ public class ConjurePacket {
     }
 
     private static @NotNull CostDefinition getCost(ResourceKey<Enchantment> enchantKey) {
-        return new CostEntry(ReagentsRegistry.server().get(enchantKey).location().toString(), "", 1, 20);
+        return ReagentsRegistry.server().get(enchantKey).toCostGroup(20);
     }
 
 }

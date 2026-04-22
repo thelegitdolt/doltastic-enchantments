@@ -16,11 +16,11 @@ public class ResourceKeyUtil {
         return ResourceKey.create(Registries.ENCHANTMENT, location);
     }
 
-    public static ResourceKey<Item> item(String location) {
+    public static ResourceKey<Item> sitem(String location) {
         return item(new ResourceLocation(location));
     }
 
-    public static ResourceKey<Enchantment> enchant(String location) {
+    public static ResourceKey<Enchantment> senchant(String location) {
         return enchant(new ResourceLocation(location));
     }
 }
