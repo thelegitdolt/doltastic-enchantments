@@ -25,6 +25,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @SuppressWarnings("removal")
 @ParametersAreNonnullByDefault
@@ -61,7 +62,8 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
 
         reagentsReg.clear();
         int reagentCount = 0;
-        DoltasticEnchantments.LOGGER.info("Loaded {} reagent jsons", pathedJsons.size());
+        DoltasticEnchantments.LOGGER.info("Loaded {} reagent jsons with paths as follows: {}", pathedJsons.size(),
+                EnchantCostUtil.reduceToString(pathedJsons.keySet(), Function.identity(), ", "));
 
         for (Map.Entry<ResourceLocation, JsonElement> jsonFile : pathedJsons.entrySet()) {
             for (Map.Entry<String, JsonElement> jsonEntry : jsonFile.getValue().getAsJsonObject().asMap().entrySet()) {
@@ -116,8 +118,6 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
             DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these don't require books: {}", EnchantCostUtil.reduceToString(booklessList, ResourceKey::location, ", "));
     }
 
-
-
     private boolean validateIDs(ResourceLocation enchantKey, BasicIngredient ingredient, ResourceLocation path, Registry<Item> itemReg, Registry<Enchantment> enchantReg) {
         boolean valid = true;
         if (!enchantReg.containsKey(enchantKey)) {
@@ -135,7 +135,6 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
 
         BasicIngredient oldItem = reagentReg.get(enchantKey);
         if (ingredient.hasModdedIds() && !oldItem.hasModdedIds()) {
-            reagentReg.getRegister().remove(enchantKey);
             return true;
         } else return ingredient.hasModdedIds() || !oldItem.hasModdedIds();
     }

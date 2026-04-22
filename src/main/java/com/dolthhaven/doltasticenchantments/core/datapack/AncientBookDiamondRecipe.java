@@ -40,7 +40,7 @@ public class AncientBookDiamondRecipe extends CustomRecipe {
                 container.getItem(7).is(Items.DIAMOND) &&
                 container.getItem(8).is(Items.DIAMOND);
         if (!matches) return false;
-        return ReagentsRegistry.getRegistry(level).containsValue(container.getItem(1), level.registryAccess());
+        return ReagentsRegistry.getRegistry(level).containsValue(container.getItem(1));
     }
 
     @Override

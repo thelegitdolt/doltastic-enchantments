@@ -4,12 +4,8 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
 import com.mojang.datafixers.util.Pair;
-import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
-import me.alfie.immersiveenchanting.datapack.cost.CostGroup;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +16,6 @@ import net.minecraft.world.level.Level;
 
 import java.util.*;
 
-@SuppressWarnings("removal")
 public class ReagentsRegistry {
     private static final ReagentsRegistry CLIENT =  new ReagentsRegistry();
     private static final ReagentsRegistry SERVER_REGISTRY =  new ReagentsRegistry();
@@ -65,7 +60,7 @@ public class ReagentsRegistry {
         return register.containsKey(enchantment);
     }
 
-    public boolean containsValue(ItemStack stack, RegistryAccess access) {
+    public boolean containsValue(ItemStack stack) {
         return register.values().stream().anyMatch(ing -> ing.test(stack));
     }
 
@@ -97,7 +92,7 @@ public class ReagentsRegistry {
 
     public void expandTags() {
         Set<Pair<ResourceKey<Enchantment>, BasicIngredient>> updatedTags = new HashSet<>();
-        for (Iterator<Map.Entry<ResourceKey<Enchantment>, BasicIngredient>> iterator = register.entrySet().iterator(); iterator.hasNext(); ) {
+        for (var iterator = register.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<ResourceKey<Enchantment>, BasicIngredient> entry = iterator.next();
             BasicIngredient ingredient = entry.getValue();
             if (ingredient.isTag()) {

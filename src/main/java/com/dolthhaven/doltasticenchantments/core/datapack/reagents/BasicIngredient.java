@@ -64,7 +64,7 @@ public record BasicIngredient(CostGroup cost, TagKey<Item> tag) {
             if (string.startsWith("#")) {
                 return new BasicIngredient(EMPTY_COST_GROUP, TagKey.create(Registries.ITEM, new ResourceLocation(string.substring(1))));
             } else {
-                return new BasicIngredient(new CostGroup(List.of(), GroupType.ANY_OF), null);
+                return new BasicIngredient(new CostGroup(List.of(EnchantCostUtil.basicCost(string, 20)), GroupType.ANY_OF), null);
             }
         }
     }
