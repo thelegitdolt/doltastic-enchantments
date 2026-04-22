@@ -8,7 +8,6 @@
     "AncientBookMixin",
     "CreativeEventsMixin",
     "DatapackParserMixin",
-    "DiggingSpeedEnchantmentMixin",
     "EnchantingTableMenuMixin",
     "EnchantingTableServerHandlerMixin",
     "EnchantmentCostMixin",
