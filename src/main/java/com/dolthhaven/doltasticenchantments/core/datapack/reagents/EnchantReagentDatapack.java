@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
@@ -101,21 +102,22 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
 
     public static void logUnreagentedEnchants(RegistryAccess access) {
         List<ResourceKey<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
-        access.registry(Registries.ENCHANTMENT).ifPresentOrElse(reg -> reg
-            .stream()
-                .filter(enchantment -> !DoltasticEnchantments.reliableRemover() || !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
+        access.registry(Registries.ENCHANTMENT).ifPresentOrElse(reg -> reg.holders()
+                .filter(enchantment -> !DoltasticEnchantments.reliableRemover() || !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment.value()))
                 .forEach(enchantment -> {
-                ResourceKey<Enchantment> enchantKey = reg.getResourceKey(enchantment).orElseThrow();
+                ResourceKey<Enchantment> enchantKey = enchantment.unwrapKey().orElseThrow();
                 if (!ReagentsRegistry.server().containsKey(enchantKey)) {
                     boolean isRequireBook = EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));
-                    (isRequireBook ? missingList : booklessList).add(enchantKey);
+                    boolean isNotTreasure = isRequireBook && reg.getTag(DETags.Enchantments.TREASURE)
+                            .map(a -> !a.contains(enchantment)).orElse(true);
+                    (isNotTreasure ? missingList : booklessList).add(enchantKey);
                 }
             }), () -> DoltasticEnchantments.LOGGER.warn("Could not find registry; this is strange"));
 
         if (!missingList.isEmpty())
             DoltasticEnchantments.LOGGER.warn("The following enchantments have no associated reagent: {}", EnchantCostUtil.reduceToString(missingList, ResourceKey::location,  ", "));
         if (!booklessList.isEmpty())
-            DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these don't require books: {}", EnchantCostUtil.reduceToString(booklessList, ResourceKey::location, ", "));
+            DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these are treasure or are bookless: {}", EnchantCostUtil.reduceToString(booklessList, ResourceKey::location, ", "));
     }
 
     private boolean validateIDs(ResourceLocation enchantKey, BasicIngredient ingredient, ResourceLocation path, Registry<Item> itemReg, Registry<Enchantment> enchantReg) {

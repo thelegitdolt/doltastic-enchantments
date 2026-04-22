@@ -4,5 +4,13 @@
       "text": "Doltastic Enchantment resources"
     },
     "pack_format": 15
+  },
+  "filter": {
+   "block": [
+      {
+        "namespace": "immersiveenchanting",
+        "path": "enchantment_costs/.*"
+      }
+    ]
   }
 }

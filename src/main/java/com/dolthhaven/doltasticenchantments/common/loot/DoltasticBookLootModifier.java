@@ -1,16 +1,22 @@
 package com.dolthhaven.doltasticenchantments.common.loot;
 
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -46,7 +52,8 @@ public class DoltasticBookLootModifier extends LootModifier {
             if (instance.tables.contains(context.getQueriedLootTableId())) {
                 float weight = instance.weight;
                 RandomSource random = context.getRandom();
-                List<Holder<Enchantment>> enchantments = sample(instance.enchantments, instance.sampleCount.sample(random), random);
+                List<Holder<Enchantment>> enchantments = sample(instance
+                        .getEnchantments(context.getLevel().registryAccess()), instance.sampleCount.sample(random), random);
                 if (enchantments.isEmpty()) continue;
                 ItemStack book = BookUtil.newBookWith(enchantments);
 
@@ -63,13 +70,40 @@ public class DoltasticBookLootModifier extends LootModifier {
         return CODEC.get();
     }
 
-    public record BookInstance(List<Holder<Enchantment>> enchantments, List<ResourceLocation> tables, float weight, UniformInt sampleCount) {
+    public record BookInstance(List<Holder<Enchantment>> enchantments, List<Holder<Item>> items, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount) {
+        private static final List<Item> COMMON_ITEMS = List.of(Items.DIAMOND_PICKAXE, Items.DIAMOND_AXE, Items.DIAMOND_HOE, Items.DIAMOND_SHOVEL, Items.DIAMOND_SWORD,
+                Items.DIAMOND_HELMET, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_LEGGINGS, Items.DIAMOND_BOOTS);
+
         public static final Codec<BookInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BuiltInRegistries.ENCHANTMENT.holderByNameCodec().listOf().fieldOf("enchantments").forGetter(BookInstance::enchantments),
+                BuiltInRegistries.ENCHANTMENT.holderByNameCodec().listOf().optionalFieldOf("enchantments", List.of()).forGetter(BookInstance::enchantments),
+                BuiltInRegistries.ITEM.holderByNameCodec().listOf().optionalFieldOf("items", List.of()).forGetter(BookInstance::items),
+                Codec.BOOL.optionalFieldOf("commonEnchants", false).forGetter(BookInstance::commonEnchants),
                 ResourceLocation.CODEC.listOf().fieldOf("tables").forGetter(BookInstance::tables),
                 Codec.FLOAT.fieldOf("weight").forGetter(BookInstance::weight),
-                UniformInt.CODEC.fieldOf("sample_count").orElse(UniformInt.of(1, 3)).forGetter(BookInstance::sampleCount)
+                UniformInt.CODEC.fieldOf("sample_count").orElse(UniformInt.of(1, 2)).forGetter(BookInstance::sampleCount)
         ).apply(instance, BookInstance::new));
+
+        public List<Holder<Enchantment>> getEnchantments(RegistryAccess access) {
+            Registry<Enchantment> registry = access.registryOrThrow(Registries.ENCHANTMENT);
+            if (items.isEmpty() && !commonEnchants) return enchantments;
+            else {
+                List<Item> items;
+                if (commonEnchants) {
+                    items = COMMON_ITEMS;
+                } else {
+                    items = this.items.stream().map(Holder::value).toList();
+                }
+                return registry.holders()
+                        .filter(enchantment -> {
+                            var thing = registry.getTag(DETags.Enchantments.TREASURE);
+                            if (thing.isEmpty()) return true;
+                            else return !thing.orElseThrow().contains(enchantment);
+                        })
+                        .filter(enchantment -> !enchantment.value().isCurse() &&
+                                items.stream().anyMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
+                        .map(a -> (Holder<Enchantment>) a).toList();
+            }
+        }
     }
 
     private static <E> List<E> sample(List<E> original, int amount, RandomSource random) {

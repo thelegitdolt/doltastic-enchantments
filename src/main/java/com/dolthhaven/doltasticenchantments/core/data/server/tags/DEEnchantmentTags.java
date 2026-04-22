@@ -16,6 +16,6 @@ public class DEEnchantmentTags extends IntrinsicHolderTagsProvider<Enchantment> 
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(DETags.Enchantments.TREASURE).add(Enchantments.SOUL_SPEED, Enchantments.SWIFT_SNEAK);
+        tag(DETags.Enchantments.TREASURE).add(Enchantments.SOUL_SPEED, Enchantments.SWIFT_SNEAK, Enchantments.MENDING);
     }
 }
