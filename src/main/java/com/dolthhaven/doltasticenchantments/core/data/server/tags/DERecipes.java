@@ -15,6 +15,6 @@ public class DERecipes extends BlueprintRecipeProvider {
     }
 
     public void buildRecipes(Consumer<FinishedRecipe> consumer) {
-        SpecialRecipeBuilder.special(DERecipeSerializers.ANCIENT_BOOK.get()).save(consumer, "ancient_book_from_diamonds");
+        SpecialRecipeBuilder.special(DERecipeSerializers.ANCIENT_BOOK.get()).save(consumer, "%s:ancient_book_from_diamonds".formatted(DoltasticEnchantments.MOD_ID));
     }
 }

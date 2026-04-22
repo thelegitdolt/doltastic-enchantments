@@ -61,6 +61,8 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
 
         reagentsReg.clear();
         int reagentCount = 0;
+        DoltasticEnchantments.LOGGER.info("Loaded {} reagent jsons", pathedJsons.size());
+
         for (Map.Entry<ResourceLocation, JsonElement> jsonFile : pathedJsons.entrySet()) {
             for (Map.Entry<String, JsonElement> jsonEntry : jsonFile.getValue().getAsJsonObject().asMap().entrySet()) {
                 ResourceLocation enchant = new ResourceLocation(jsonEntry.getKey());
