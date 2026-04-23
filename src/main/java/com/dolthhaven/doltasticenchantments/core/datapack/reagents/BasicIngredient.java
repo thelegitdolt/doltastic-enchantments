@@ -2,7 +2,7 @@ package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.google.gson.JsonElement;
 import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
 import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
@@ -82,7 +82,7 @@ public record BasicIngredient(CostGroup cost, TagKey<Item> tag) {
         if (!isTag()){
             List<String> illegalItems = new ArrayList<>();
             this.castedCost().forEach(entry -> {
-                if (!registry.containsKey(ResourceKeyUtil.sitem(entry.item()))) {
+                if (!registry.containsKey(ResourceUtil.sitem(entry.item()))) {
                     illegalItems.add(entry.item());
                 }
             });

@@ -2,6 +2,10 @@
   "values": [
     "minecraft:soul_speed",
     "minecraft:swift_sneak",
-    "minecraft:mending"
+    "minecraft:mending",
+    {
+      "id": "airhop:air_hop",
+      "required": false
+    }
   ]
 }

@@ -2,7 +2,7 @@ package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -52,7 +52,7 @@ public class ReagentsRegistry {
     }
 
     public BasicIngredient put(ResourceLocation enchantment, BasicIngredient item) {
-        return put(ResourceKeyUtil.enchant(enchantment), item);
+        return put(ResourceUtil.enchant(enchantment), item);
     }
 
 

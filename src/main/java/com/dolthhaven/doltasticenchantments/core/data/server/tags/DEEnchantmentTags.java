@@ -4,6 +4,7 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -16,6 +17,7 @@ public class DEEnchantmentTags extends IntrinsicHolderTagsProvider<Enchantment> 
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(DETags.Enchantments.TREASURE).add(Enchantments.SOUL_SPEED, Enchantments.SWIFT_SNEAK, Enchantments.MENDING);
+        tag(DETags.Enchantments.TREASURE).add(Enchantments.SOUL_SPEED, Enchantments.SWIFT_SNEAK, Enchantments.MENDING)
+                .addOptional(new ResourceLocation("airhop:air_hop"));
     }
 }

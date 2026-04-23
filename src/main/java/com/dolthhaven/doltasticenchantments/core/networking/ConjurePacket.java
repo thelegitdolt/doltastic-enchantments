@@ -3,7 +3,7 @@ package com.dolthhaven.doltasticenchantments.core.networking;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
 import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
 import me.alfie.immersiveenchanting.gui.EnchantingTableMenu;
@@ -53,7 +53,7 @@ public class ConjurePacket {
 
     private static void exec(NetworkEvent.Context ctx, String enchantmentString) {
         ServerPlayer player = ctx.getSender();
-        ResourceKey<Enchantment> enchantKey = ResourceKeyUtil.senchant(enchantmentString);
+        ResourceKey<Enchantment> enchantKey = ResourceUtil.senchant(enchantmentString);
         Optional<Registry<Enchantment>> registry = player.level().registryAccess().registry(Registries.ENCHANTMENT);
         if (registry.isEmpty()) return;
 

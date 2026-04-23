@@ -4,7 +4,7 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.ResourceKeyUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -72,7 +72,7 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
                 BasicIngredient ingredient = BasicIngredient.parseJson(jsonEntry.getValue());
 
                 boolean shouldPutNew = validateIDs(enchant, ingredient, jsonFile.getKey(), itemReg, enchantReg)
-                        && calculatePriority(reagentsReg, ResourceKeyUtil.enchant(enchant), ingredient);
+                        && calculatePriority(reagentsReg, ResourceUtil.enchant(enchant), ingredient);
 
                 if (shouldPutNew) {
                     reagentCount++;

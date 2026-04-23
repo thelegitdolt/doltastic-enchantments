@@ -11,6 +11,7 @@
     "EnchantingTableMenuMixin",
     "EnchantingTableServerHandlerMixin",
     "EnchantmentCostMixin",
+    "FillChiseledBookshelfProcessorMixin",
     "PlayerMixin",
     "bookenchanting.EnchantingTabMixin",
     "defaultreagents.DatapackEventsMixin",
