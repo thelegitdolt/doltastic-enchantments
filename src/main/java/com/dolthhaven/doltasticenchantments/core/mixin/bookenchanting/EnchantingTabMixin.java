@@ -27,10 +27,9 @@ import java.util.List;
 
 @Mixin(EnchantingTab.class)
 public class EnchantingTabMixin implements ReagentStackHolder {
-    @Shadow @Final public EnchantingTableScreen screen;
-    @Shadow private NodeTooltip nodeTooltip;
+    @Shadow(remap = false) @Final public EnchantingTableScreen screen;
+    @Shadow(remap = false) private NodeTooltip nodeTooltip;
 
-    @Shadow private Node lastHoveredNode;
     @Unique private ItemStack reagentStack;
 
     @Override

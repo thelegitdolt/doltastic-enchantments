@@ -10,6 +10,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
+@SuppressWarnings("removal")
 public class DEEnchantmentTags extends IntrinsicHolderTagsProvider<Enchantment> {
     public DEEnchantmentTags(GatherDataEvent event) {
         super(event.getGenerator().getPackOutput(), Registries.ENCHANTMENT, event.getLookupProvider(), enchantment -> ForgeRegistries.ENCHANTMENTS.getResourceKey(enchantment).get(), DoltasticEnchantments.MOD_ID, event.getExistingFileHelper());

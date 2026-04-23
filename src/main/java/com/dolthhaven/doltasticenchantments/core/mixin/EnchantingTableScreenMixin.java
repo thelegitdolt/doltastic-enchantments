@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EnchantingTableScreen.class)
 public class EnchantingTableScreenMixin {
-    @Shadow @Final public EnchantingTab enchantingTab;
+    @Shadow(remap = false) @Final public EnchantingTab enchantingTab;
 
     // adds a listener for reagent slots, for ancient books
     @Inject(method = "containerTick", at = @At("TAIL"))

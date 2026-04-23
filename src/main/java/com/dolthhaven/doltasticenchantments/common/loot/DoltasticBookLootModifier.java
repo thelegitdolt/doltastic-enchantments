@@ -3,11 +3,14 @@ package com.dolthhaven.doltasticenchantments.common.loot;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
+import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
+import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -22,6 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
@@ -33,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@SuppressWarnings("removal")
 public class DoltasticBookLootModifier extends LootModifier {
     public static final Supplier<Codec<DoltasticBookLootModifier>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.create(instance ->
             codecStart(instance)
@@ -55,14 +60,10 @@ public class DoltasticBookLootModifier extends LootModifier {
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         for (BookInstance instance : booksToInject) {
             if (!instance.tables.contains(context.getQueriedLootTableId())) continue;
-            double booksCount = Math.min(
-                    Math.ceil(instance.weight) + 1,
-                    Math.round(context.getRandom().nextFloat() * instance.weight * 2)
-            );
-            for (int i = 0; i < booksCount; i++) {
+            for (int i = 0; i < blackBoxNormalizationFunctionWithExpectedValueEqualToTheFloat(instance.weight, context.getRandom()); i++) {
                 RandomSource random = context.getRandom();
                 List<Holder<Enchantment>> enchantments = sample(instance
-                        .getEnchantments(context.getLevel().registryAccess()), instance.sampleCount.sample(random), random);
+                        .getEnchantments(context.getLevel()), instance.sampleCount.sample(random), random);
                 if (enchantments.isEmpty()) continue;
                 ItemStack book = BookUtil.newBookWith(enchantments);
 
@@ -103,12 +104,13 @@ public class DoltasticBookLootModifier extends LootModifier {
                 UniformInt.CODEC.fieldOf("enchantCount").orElse(UniformInt.of(1, 2)).forGetter(BookInstance::sampleCount)
         ).apply(instance, BookInstance::new));
 
-        public List<Holder<Enchantment>> getEnchantments(RegistryAccess access) {
+        public List<Holder<Enchantment>> getEnchantments(Level level) {
+            RegistryAccess access = level.registryAccess();
             Registry<Enchantment> registry = access.registryOrThrow(Registries.ENCHANTMENT);
             if (items.isEmpty() && !commonEnchants) return enchantments;
             else {
                 List<Item> items = commonEnchants ? COMMON_ITEMS.get() : this.items.stream().map(Holder::value).toList();
-                List<Holder<Enchantment>> holders =  registry.holders()
+                List<Holder<Enchantment>> holders = registry.holders()
                         // the actual filter
                         .filter(enchantment -> !enchantment.value().isCurse() &&
                                 items.stream().anyMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
@@ -119,9 +121,13 @@ public class DoltasticBookLootModifier extends LootModifier {
                             if (enchantReg.isEmpty()) return true;
                             else return !enchantReg.orElseThrow().contains(enchantment);
                         })
+                        // requires book and is enabled
+                        .filter(enchantment -> {
+                            EnchantmentCost cost = EnchantmentCostRegistry.getRegistry(level).getEnchantmentCost(enchantment.unwrapKey().orElseThrow());
+                            return EnchantCostUtil.requiresBook(cost) && cost.enabled;
+                        })
                         // unbreaking only shows up if we are doing commonEnchant
                         .filter(enchantment -> !this.commonEnchants || (enchantment.value() != Enchantments.UNBREAKING))
-                        // the actual filter
                         .map(a -> (Holder<Enchantment>) a).toList();
                 List<Holder<Enchantment>> allEnchantments = new ArrayList<>(this.enchantments);
                 allEnchantments.addAll(holders);
@@ -140,5 +146,22 @@ public class DoltasticBookLootModifier extends LootModifier {
             sampled.add(copy.remove(random.nextInt(copy.size())));
         }
         return sampled;
+    }
+
+    public static int blackBoxNormalizationFunctionWithExpectedValueEqualToTheFloat(float thing, RandomSource random) {
+        if (thing < 1) {
+            return random.nextDouble() < thing ? 1 : 0;
+        }
+
+        int quotient = (int) (thing / 0.5);
+        double remainder = thing % 0.5;
+
+        int times = 0;
+        for (int i = 0; i < quotient; i++) {
+            if (random.nextDouble() < 0.5) times += 1;
+        }
+        if (random.nextDouble() < remainder) times += 1;
+
+        return times;
     }
 }

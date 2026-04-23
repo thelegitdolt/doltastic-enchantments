@@ -9,7 +9,7 @@
    "block": [
       {
         "namespace": "immersiveenchanting",
-        "path": "enchantment_costs/.*"
+        "path": "enchantment_costs/minecraft/.*"
       }
     ]
   }

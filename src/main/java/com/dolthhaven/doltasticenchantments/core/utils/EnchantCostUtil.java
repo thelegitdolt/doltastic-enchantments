@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public class EnchantCostUtil {
+    public static final String REQUIRES_BOOK = "requiresBook";
     public static boolean requiresBook(EnchantmentCost cost) {
         return (cost instanceof DefaultEnchantmentHolder holder && holder.requiresBook());
     }
@@ -34,7 +35,7 @@ public class EnchantCostUtil {
         return stringBuilder.toString();
     }
 
-    public static EnchantmentCost createFairyDustCosts(boolean enabled, List<Integer> defaultCosts) {
+    public static EnchantmentCost createFairyDustCosts(boolean enabled, List<Integer> defaultCosts, boolean unlockedByDefault) {
         Map<String, CostDefinition> levelCosts = new HashMap<>();
 
         for (int i = 1; i <= defaultCosts.size(); i++) {
@@ -42,7 +43,9 @@ public class EnchantCostUtil {
             CostEntry costEntry = amount == 0 ? CostEntry.EMPTY : new CostEntry(BuiltInRegistries.ITEM.getKey(DEItems.FAIRY_DUST.get()).toString(), "", amount,0);
             levelCosts.put(String.valueOf(i), costEntry);
         }
-        return new EnchantmentCost(levelCosts, enabled);
+        EnchantmentCost cost = new EnchantmentCost(levelCosts, enabled);
+        ((DefaultEnchantmentHolder) cost).setRequiresBook(unlockedByDefault);
+        return cost;
     }
 
     public static List<Integer> defaultCosts(int maxLevel) {

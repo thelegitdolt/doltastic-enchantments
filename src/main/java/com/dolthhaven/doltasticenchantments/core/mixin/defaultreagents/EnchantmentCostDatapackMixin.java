@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.mixin.defaultreagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
 import com.dolthhaven.doltasticenchantments.core.datapack.RegistryAccessHolder;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.google.gson.JsonElement;
@@ -50,34 +51,14 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V",
         at = @At("HEAD"), remap = false)
     private void DoltasticEnchants$RemoveInvalidEnchants(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci, @Share("enchant") LocalRef<Registry<Enchantment>> enchant) {
-        Registry<Enchantment> enchantReg = access.registry(Registries.ENCHANTMENT).orElseThrow(() -> new EnchantmentCostParseException("Cannot unpack enchantment costs, registry not found"));
-        enchant.set(enchantReg);
-        Set<ResourceLocation> removedEnchants = new HashSet<>();
-        object.keySet().removeIf(location -> {
-            ResourceLocation enchantLoc = new ResourceLocation(location.getPath().replace('/', ':'));
-            for (var cost : EnchantmentCostRegistry.InternalCosts.values()) {
-                if (cost.getId().equals(enchantLoc.toString())) return false;
-            }
-
-            if (!enchantReg.containsKey(enchantLoc)) {
-                removedEnchants.add(enchantLoc);
-                return true;
-            } return false;
-        });
-        if (!removedEnchants.isEmpty()){
-            DoltasticEnchantments.LOGGER.error("DOLTASTIC ENCHANT: The following paths in Enchantment Cost datapack are invalid, since they do not correspond to a real enchantment: {}",
-                    EnchantCostUtil.reduceToString(removedEnchants, Function.identity(), ", "));
-        }
+        DoltasticEnchantments$RemoveInvalidResources(access, enchant, object);
     }
 
     @WrapOperation(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V",
             at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/datapack/parser/DatapackParser;parseJson(Lcom/google/gson/JsonElement;)Lme/alfie/immersiveenchanting/datapack/cost/EnchantmentCost;"), remap = false)
     private EnchantmentCost DoltasticEnchantments$AddDefaultEnchantmentCost(JsonElement levelKey, Operation<EnchantmentCost> original, @Local String[] parts, @Share("enchant") LocalRef<Registry<Enchantment>> enchant) {
-        try {
-            return original.call(levelKey);
-        } catch (EnchantmentCostParseException exception) {
-            return DoltasticEnchantments$doDefaultFairyDustCost(levelKey, parts, requireNonNull(enchant.get().get(new ResourceLocation(parts[0], parts[1]))));
-        }
+        if (isInternalCost(parts[0] + ":" + parts[1])) return original.call(levelKey);
+        return DoltasticEnchantments$doDefaultFairyDustCost(levelKey, parts, requireNonNull(enchant.get().get(new ResourceLocation(parts[0], parts[1]))));
     }
 
     @Definition(id = "server", field = "Lme/alfie/immersiveenchanting/datapack/EnchantmentCostDatapack;server:Lnet/minecraft/server/MinecraftServer;")
@@ -90,7 +71,7 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
             holder.unwrapKey().ifPresent(key -> {
                 if (!reg.getCostRegistry().containsKey(key)) {
                     locations.add(key.location());
-                    reg.getCostRegistry().put(key, EnchantCostUtil.createFairyDustCosts(true, EnchantCostUtil.defaultCosts(holder.value().getMaxLevel())));
+                    reg.getCostRegistry().put(key, EnchantCostUtil.createFairyDustCosts(true, EnchantCostUtil.defaultCosts(holder.value().getMaxLevel()), true));
                 }
             });
         });
@@ -100,6 +81,28 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
     @Override
     public void setRegistryAccess(RegistryAccess access) {
         this.access = access;
+    }
+
+    @Unique
+    private static void DoltasticEnchantments$RemoveInvalidResources(RegistryAccess access, LocalRef<Registry<Enchantment>> enchantRegRef, Map<ResourceLocation, JsonElement> object) {
+        Registry<Enchantment> enchantReg = access.registry(Registries.ENCHANTMENT).orElseThrow(() -> new EnchantmentCostParseException("Cannot unpack enchantment costs, registry not found"));
+        enchantRegRef.set(enchantReg);
+        Set<ResourceLocation> removedEnchants = new HashSet<>();
+        object.keySet().removeIf(location -> {
+            ResourceLocation enchantLoc = new ResourceLocation(location.getPath().replace('/', ':'));
+            if (isInternalCost(enchantLoc.toString())) {
+                return false;
+            }
+
+            if (!enchantReg.containsKey(enchantLoc)) {
+                removedEnchants.add(enchantLoc);
+                return true;
+            } return false;
+        });
+         if (!removedEnchants.isEmpty()){
+            DoltasticEnchantments.LOGGER.error("DOLTASTIC ENCHANT: The following paths in Enchantment Cost datapack are invalid, since they do not correspond to a real enchantment: {}",
+                    EnchantCostUtil.reduceToString(removedEnchants, Function.identity(), ", "));
+        }
     }
 
     @Unique
@@ -114,6 +117,11 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
         if (root.has(MAX_LEVEL)) {
             maxLevel = root.get(MAX_LEVEL).getAsInt();
         }
+        boolean unlockedByDefault = true;
+
+        if (root.has(EnchantCostUtil.REQUIRES_BOOK)) {
+            unlockedByDefault = root.get(EnchantCostUtil.REQUIRES_BOOK).getAsBoolean();
+        }
 
         List<Integer> dustCosts;
         if (root.has(DEFAULT_FAIRY_DUST_AMOUNT)) {
@@ -127,6 +135,13 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
         } else {
             dustCosts = EnchantCostUtil.defaultCosts(maxLevel);
         }
-        return EnchantCostUtil.createFairyDustCosts(enabled, dustCosts);
+        return EnchantCostUtil.createFairyDustCosts(enabled, dustCosts, unlockedByDefault);
+    }
+
+    @Unique
+    private static boolean isInternalCost(String string) {
+        for (var cost : EnchantmentCostRegistry.InternalCosts.values()) {
+            if (cost.getId().equals(string)) return true;
+        } return false;
     }
 }

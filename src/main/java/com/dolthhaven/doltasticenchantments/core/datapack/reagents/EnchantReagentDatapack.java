@@ -107,10 +107,9 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
                 .forEach(enchantment -> {
                 ResourceKey<Enchantment> enchantKey = enchantment.unwrapKey().orElseThrow();
                 if (!ReagentsRegistry.server().containsKey(enchantKey)) {
-                    boolean isRequireBook = EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));
-                    boolean isNotTreasure = isRequireBook || reg.getTag(DETags.Enchantments.TREASURE)
-                            .map(a -> !a.contains(enchantment)).orElse(true);
-                    (isNotTreasure ? missingList : booklessList).add(enchantKey);
+                    boolean doesntRequireBook = !EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));
+                    boolean isTreasure = ResourceUtil.isTag(enchantment, DETags.Enchantments.TREASURE, reg);
+                    (doesntRequireBook || isTreasure ? booklessList : missingList).add(enchantKey);
                 }
             }), () -> DoltasticEnchantments.LOGGER.warn("Could not find registry; this is strange"));
 
