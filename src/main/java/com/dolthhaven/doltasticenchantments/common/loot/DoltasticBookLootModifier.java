@@ -1,7 +1,9 @@
 package com.dolthhaven.doltasticenchantments.common.loot;
 
+import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
+import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -19,6 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
@@ -106,13 +109,19 @@ public class DoltasticBookLootModifier extends LootModifier {
             else {
                 List<Item> items = commonEnchants ? COMMON_ITEMS.get() : this.items.stream().map(Holder::value).toList();
                 List<Holder<Enchantment>> holders =  registry.holders()
+                        // the actual filter
+                        .filter(enchantment -> !enchantment.value().isCurse() &&
+                                items.stream().anyMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
+                        // not treasure or removed by reliable remover
                         .filter(enchantment -> {
+                            if (DoltasticEnchantments.reliableRemover() && DEReliableRemoverCompat.isEnchantmentRemoved(enchantment.value())) return false;
                             var enchantReg = registry.getTag(DETags.Enchantments.TREASURE);
                             if (enchantReg.isEmpty()) return true;
                             else return !enchantReg.orElseThrow().contains(enchantment);
                         })
-                        .filter(enchantment -> !enchantment.value().isCurse() &&
-                                items.stream().anyMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
+                        // unbreaking only shows up if we are doing commonEnchant
+                        .filter(enchantment -> !this.commonEnchants || (enchantment.value() != Enchantments.UNBREAKING))
+                        // the actual filter
                         .map(a -> (Holder<Enchantment>) a).toList();
                 List<Holder<Enchantment>> allEnchantments = new ArrayList<>(this.enchantments);
                 allEnchantments.addAll(holders);

@@ -6,6 +6,10 @@
     {
       "id": "airhop:air_hop",
       "required": false
+    },
+    {
+      "id": "netherexp:phantasm_hull",
+      "required": false
     }
   ]
 }

@@ -108,7 +108,7 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
                 ResourceKey<Enchantment> enchantKey = enchantment.unwrapKey().orElseThrow();
                 if (!ReagentsRegistry.server().containsKey(enchantKey)) {
                     boolean isRequireBook = EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));
-                    boolean isNotTreasure = isRequireBook && reg.getTag(DETags.Enchantments.TREASURE)
+                    boolean isNotTreasure = isRequireBook || reg.getTag(DETags.Enchantments.TREASURE)
                             .map(a -> !a.contains(enchantment)).orElse(true);
                     (isNotTreasure ? missingList : booklessList).add(enchantKey);
                 }

@@ -2,10 +2,12 @@ package com.dolthhaven.doltasticenchantments.core.mixin;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
+import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
 import me.alfie.immersiveenchanting.structure.FillChiseledBookshelfProcessor;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
@@ -21,12 +23,11 @@ import org.spongepowered.asm.mixin.injection.At;
 public class FillChiseledBookshelfProcessorMixin {
     @WrapOperation(method = "setChiseledBookshelfLoot", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/util/EnchantmentUtil;getRandomEnchantment(Lnet/minecraft/world/level/Level;Lnet/minecraft/util/RandomSource;)Lnet/minecraft/core/Holder;"), remap = false)
     private Holder<Enchantment> DoltasticEnchantments$FilterRRs(Level level, RandomSource randomSource, Operation<Holder<Enchantment>> original) {
-        if (DoltasticEnchantments.reliableRemover()) {
-            Registry<Enchantment> enchantReg = level.registryAccess().registry(Registries.ENCHANTMENT).orElseThrow();
-            return Util.getRandom(enchantReg.holders().filter(holder ->
-                            !DEReliableRemoverCompat.isEnchantmentRemoved(holder.value()) &&
-                            !ResourceUtil.isTag(holder, DETags.Enchantments.TREASURE, enchantReg)).toList(), randomSource);
-        }
-        return original.call(level, randomSource);
+        Registry<Enchantment> enchantReg = level.registryAccess().registry(Registries.ENCHANTMENT).orElseThrow();
+        return Util.getRandom(enchantReg.holders().filter(holder ->
+                        !ResourceUtil.isTag(holder, DETags.Enchantments.TREASURE, enchantReg) &&
+                        EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getRegistry(level).getEnchantmentCost(holder.unwrapKey().orElseThrow())) &&
+                        !(DoltasticEnchantments.reliableRemover() && DEReliableRemoverCompat.isEnchantmentRemoved(holder.value())))
+                .toList(), randomSource);
     }
 }

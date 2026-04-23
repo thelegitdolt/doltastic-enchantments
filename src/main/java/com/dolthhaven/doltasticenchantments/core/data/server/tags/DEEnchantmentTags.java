@@ -18,6 +18,7 @@ public class DEEnchantmentTags extends IntrinsicHolderTagsProvider<Enchantment> 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(DETags.Enchantments.TREASURE).add(Enchantments.SOUL_SPEED, Enchantments.SWIFT_SNEAK, Enchantments.MENDING)
-                .addOptional(new ResourceLocation("airhop:air_hop"));
+                .addOptional(new ResourceLocation("airhop:air_hop"))
+                .addOptional(new ResourceLocation("netherexp:phantasm_hull"));
     }
 }
