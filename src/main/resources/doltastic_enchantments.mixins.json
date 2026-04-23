@@ -6,6 +6,7 @@
   "mixins": [
     "AncientBookLootModifierMixin",
     "AncientBookMixin",
+    "CostHelperMixin",
     "CreativeEventsMixin",
     "DatapackParserMixin",
     "EnchantingTableMenuMixin",
