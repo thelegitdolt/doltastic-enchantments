@@ -8,6 +8,10 @@
       "required": false
     },
     {
+      "id": "supplementaries:stasis",
+      "required": false
+    },
+    {
       "id": "netherexp:phantasm_hull",
       "required": false
     }

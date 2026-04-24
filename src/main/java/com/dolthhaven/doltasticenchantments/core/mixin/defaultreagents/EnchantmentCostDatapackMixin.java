@@ -1,7 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.mixin.defaultreagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
 import com.dolthhaven.doltasticenchantments.core.datapack.RegistryAccessHolder;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.google.gson.JsonElement;
