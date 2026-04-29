@@ -7,12 +7,8 @@ import com.dolthhaven.doltasticenchantments.core.utils.ReagentStackUtil;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
-import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
 import me.alfie.immersiveenchanting.gui.EnchantingTableScreen;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.EnchantingTab;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.Node;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.NodeTooltip;
+import me.alfie.immersiveenchanting.gui.tab.enchanting.EnchantingTab;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
@@ -28,7 +24,6 @@ import java.util.List;
 @Mixin(EnchantingTab.class)
 public class EnchantingTabMixin implements ReagentStackHolder {
     @Shadow(remap = false) @Final public EnchantingTableScreen screen;
-    @Shadow(remap = false) private NodeTooltip nodeTooltip;
 
     @Unique private ItemStack reagentStack;
 
