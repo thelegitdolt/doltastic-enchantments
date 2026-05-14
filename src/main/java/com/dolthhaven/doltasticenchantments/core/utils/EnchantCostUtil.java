@@ -2,6 +2,10 @@ package com.dolthhaven.doltasticenchantments.core.utils;
 
 import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
+import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
+import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
+import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
+import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;

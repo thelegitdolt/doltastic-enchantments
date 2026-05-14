@@ -17,7 +17,6 @@ import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
 import me.alfie.immersiveenchanting.item.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -39,19 +38,15 @@ public class DEEmiPlugin implements EmiPlugin {
 
         for (CraftingRecipe recipe : getRecipes(emiRegistry, RecipeType.CRAFTING)) {
             if (recipe instanceof AncientBookDiamondRecipe) {
-                DoltasticEnchantments.LOGGER.info("Found ancient book recipe! Adding EMI integration...");
+                DoltasticEnchantments.LOGGER.info("Found diamond recipe! Adding Emi integration...");
                 ReagentsRegistry.client().getRegister().forEach((enchantKey, ingredient) -> {
                     Holder<Enchantment> enchant = EmiPort.getEnchantmentRegistry().getHolderOrThrow(enchantKey);
-                    EmiIngredient reagent = toEmiIngredient(ingredient),
+                    EmiIngredient reagent = toEmiIngredient(ingredient, EmiPort.getItemRegistry()),
                                   diamond = EmiStack.of(Items.DIAMOND),
                                   book = EmiStack.of(Items.BOOK);
                     EmiStack ancientBook = EmiStack.of(BookUtil.newBookWith(enchant));
 
-                    ResourceLocation uniqueId = recipe.getId().withPath(path ->
-                            path + "/" + enchantKey.location().toString().replace(':', '_')
-                    );
-
-                    emiRegistry.addRecipe(new EmiCraftingRecipe(List.of(diamond, reagent, diamond, diamond, book, diamond, diamond, diamond, diamond), ancientBook, uniqueId));
+                    emiRegistry.addRecipe(new EmiCraftingRecipe(List.of(diamond, reagent, diamond, diamond, book, diamond, diamond, diamond, diamond), ancientBook, recipe.getId()));
                 });
                 break;
             }
@@ -64,7 +59,7 @@ public class DEEmiPlugin implements EmiPlugin {
         return stream::iterator;
     }
 
-    private static EmiIngredient toEmiIngredient(BasicIngredient ingredient) {
+    private static EmiIngredient toEmiIngredient(BasicIngredient ingredient, Registry<Item> itemReg) {
         if (ingredient.tag() == null) {
             return EmiIngredient.of(ingredient.castedCost().stream().map(a -> EmiStack.of(a.asItem())).collect(Collectors.toList()));
         } else {

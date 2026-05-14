@@ -22,9 +22,5 @@ public class DEEnchantmentTags extends IntrinsicHolderTagsProvider<Enchantment> 
                 .addOptional(new ResourceLocation("airhop:air_hop"))
                 .addOptional(new ResourceLocation("supplementaries:stasis"))
                 .addOptional(new ResourceLocation("netherexp:phantasm_hull"));
-
-        tag(DETags.Enchantments.DOESNT_REQUIRE_BOOK).add(Enchantments.BLOCK_EFFICIENCY, Enchantments.IMPALING, Enchantments.POWER_ARROWS,
-                Enchantments.FISHING_SPEED, Enchantments.SILK_TOUCH)
-                .addOptional(new ResourceLocation("farmersdelight", "backstabbing"));
     }
 }

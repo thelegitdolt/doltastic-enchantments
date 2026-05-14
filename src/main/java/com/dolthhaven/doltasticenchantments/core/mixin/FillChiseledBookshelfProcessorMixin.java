@@ -2,37 +2,32 @@ package com.dolthhaven.doltasticenchantments.core.mixin;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
-import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
-import me.alfie.immersiveenchanting.datapack.enchantment_cost.CostRegistry;
+import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
 import me.alfie.immersiveenchanting.structure.FillChiseledBookshelfProcessor;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(FillChiseledBookshelfProcessor.class)
 public class FillChiseledBookshelfProcessorMixin {
-    @WrapOperation(method = "finalizeProcessing", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/structure/FillChiseledBookshelfProcessor;rollLootForSlot(Lnet/minecraft/util/RandomSource;)Lnet/minecraft/world/item/ItemStack;"), remap = false)
-    private ItemStack DoltasticEnchantments$FilterRRs(FillChiseledBookshelfProcessor instance, RandomSource source, Operation<ItemStack> original, @Local(argsOnly = true) ServerLevelAccessor accessor) {
-        var enchantReg = accessor.registryAccess().registry(Registries.ENCHANTMENT);
-        if (enchantReg.isEmpty()) return original.call(instance, source);
-
-        Holder<Enchantment> enchantment = Util.getRandom(CostRegistry.server().getAllEnchantmentHolders().stream().filter(holder ->
-                        !ResourceUtil.isTag(holder, DETags.Enchantments.TREASURE, enchantReg.orElseThrow()) &&
-                        !ResourceUtil.isTag(holder, DETags.Enchantments.DOESNT_REQUIRE_BOOK, enchantReg.orElseThrow()) &&
+    @WrapOperation(method = "setChiseledBookshelfLoot", at = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/util/EnchantmentUtil;getRandomEnchantment(Lnet/minecraft/world/level/Level;Lnet/minecraft/util/RandomSource;)Lnet/minecraft/core/Holder;"), remap = false)
+    private Holder<Enchantment> DoltasticEnchantments$FilterRRs(Level level, RandomSource randomSource, Operation<Holder<Enchantment>> original) {
+        Registry<Enchantment> enchantReg = level.registryAccess().registry(Registries.ENCHANTMENT).orElseThrow();
+        return Util.getRandom(enchantReg.holders().filter(holder ->
+                        !ResourceUtil.isTag(holder, DETags.Enchantments.TREASURE, enchantReg) &&
+                        EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getRegistry(level).getEnchantmentCost(holder.unwrapKey().orElseThrow())) &&
                         !(DoltasticEnchantments.reliableRemover() && DEReliableRemoverCompat.isEnchantmentRemoved(holder.value())))
-                .toList(), source);
-        return BookUtil.newBookWith(enchantment);
+                .toList(), randomSource);
     }
 }

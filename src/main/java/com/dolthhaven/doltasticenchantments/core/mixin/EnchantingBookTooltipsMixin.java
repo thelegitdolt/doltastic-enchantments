@@ -67,7 +67,7 @@ public class EnchantingBookTooltipsMixin {
     }
 
     @Unique
-    private static @NotNull boolean injectsAfter(EnchantmentInstance ed, Component component, boolean isMulti) {
+    private static boolean injectsAfter(EnchantmentInstance ed, Component component, boolean isMulti) {
         try {
             if (component instanceof MutableComponent mutable) {
                 return mutable.getSiblings().get(isMulti ? 1 : 0).getContents() instanceof TranslatableContents trans && trans.getKey().equals(ed.enchantment.getDescriptionId());

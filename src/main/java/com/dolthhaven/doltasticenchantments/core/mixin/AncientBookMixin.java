@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.mixin;
 
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -14,11 +15,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 import java.util.List;
 
@@ -27,15 +29,15 @@ public class AncientBookMixin extends Item {
     public AncientBookMixin(Properties pProperties) {
         super(pProperties);
     }
-    @Unique
-    private static final String LORE_KEY = "item.immersiveenchanting.ancient_book.desc.enchantment";
 
-    @Inject(method = "appendHoverText", at  = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
+    @WrapOperation(method = "appendHoverText", slice = @Slice(
+            from = @At(value = "INVOKE", target = "Lnet/minecraft/core/Holder;value()Ljava/lang/Object;"),
+            to = @At(value = "INVOKE", target = "Lme/alfie/immersiveenchanting/datacomponent/ReplicatedNBT;isReplicated(Lnet/minecraft/world/item/ItemStack;)Z")
+    ), at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
     private <E> boolean DoltasticEnchantments$RenderEveryEnchantment(List<Component> instance, E e, Operation<Boolean> original, @Local(argsOnly = true) ItemStack book, @Local RegistryAccess access) {
         List<ResourceKey<Enchantment>> enchants = BookUtil.getAllStoredEnchantments(book);
         if (enchants.size() == 1) return original.call(instance, e);
-
-        MutableComponent loreText = Component.translatable(LORE_KEY);
+        MutableComponent loreText = Component.translatable(AncientBook.TRANSLATION_KEY);
         loreText.append(":");
         instance.add(loreText);
         for (ResourceKey<Enchantment> enchantKey : enchants) {
