@@ -3,7 +3,7 @@ package com.dolthhaven.doltasticenchantments.core.mixin;
 import com.dolthhaven.doltasticenchantments.core.datapack.ReagentStackHolder;
 import com.dolthhaven.doltasticenchantments.core.utils.ReagentStackUtil;
 import me.alfie.immersiveenchanting.gui.EnchantingTableScreen;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.EnchantingTab;
+import me.alfie.immersiveenchanting.gui.tab.enchanting.EnchantingTab;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

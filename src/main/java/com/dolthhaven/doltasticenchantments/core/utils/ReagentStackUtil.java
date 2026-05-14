@@ -4,11 +4,7 @@ import com.dolthhaven.doltasticenchantments.common.enchanting.graph.AncientBookB
 import com.dolthhaven.doltasticenchantments.core.datapack.ReagentStackHolder;
 import me.alfie.immersiveenchanting.gui.EnchantingTableMenu;
 import me.alfie.immersiveenchanting.gui.EnchantingTableScreen;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.EnchantingTab;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.BranchFactory;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.Node;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.NodeBranch;
-import me.alfie.immersiveenchanting.gui.core.tab.enchanting.node.enchanting.EnchantingNode;
+import me.alfie.immersiveenchanting.gui.tab.enchanting.EnchantingTab;
 import me.alfie.immersiveenchanting.util.EnchantmentUtil;
 import me.alfie.immersiveenchanting.util.FxHelper;
 import net.minecraft.core.Holder;

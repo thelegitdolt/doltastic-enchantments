@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.utils;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -29,6 +30,11 @@ public class ResourceUtil {
 
     public static boolean isTag(Holder<Enchantment> holder, TagKey<Enchantment> tag, Registry<Enchantment> enchantReg) {
         return enchantReg.getTag(tag).map(key -> key.contains(holder)).orElse(false);
+    }
+
+    public static boolean isTag(Holder<Enchantment> holder, TagKey<Enchantment> tag, HolderLookup.Provider lookup) {
+        return lookup.lookup(Registries.ENCHANTMENT).map(lookuper ->
+                lookuper.get(tag).map(tagKey -> tagKey.contains(holder)).orElse(false)).orElse(false);
     }
 
 }
