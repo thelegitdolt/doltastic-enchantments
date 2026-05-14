@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(DatapackParser.class)
 public class DatapackParserMixin {
-
     @ModifyReturnValue(method = "toJson", at = @At(value = "RETURN"), remap = false)
     private static JsonObject DoltasticEnchantments$AttachBookRequirement(JsonObject root, EnchantmentCost cost) {
         boolean requireBook = true;

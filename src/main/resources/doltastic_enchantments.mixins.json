@@ -9,6 +9,7 @@
     "CostHelperMixin",
     "CreativeEventsMixin",
     "DatapackParserMixin",
+    "EnchantingBookTooltipsMixin",
     "EnchantingTableMenuMixin",
     "EnchantingTableServerHandlerMixin",
     "EnchantmentCostMixin",
