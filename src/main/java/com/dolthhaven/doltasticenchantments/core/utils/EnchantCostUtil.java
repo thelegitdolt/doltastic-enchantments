@@ -49,10 +49,10 @@ public class EnchantCostUtil {
     }
 
     public static List<Integer> defaultCosts(int maxLevel) {
-        if (maxLevel == 1) return List.of(2);
+        if (maxLevel == 1) return List.of(4);
         List<Integer> cost = new ArrayList<>(maxLevel);
         for (int i = 0; i < maxLevel; i++) {
-            cost.add(i);
+            cost.add(i + 2);
         }
         return cost;
     }

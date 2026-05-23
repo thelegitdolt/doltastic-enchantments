@@ -1,0 +1,50 @@
+{
+  "modifiers": [
+    {
+      "type": "pools",
+      "config": {
+        "pools": [
+          {
+            "bonus_rolls": 0.0,
+            "entries": [
+              {
+                "type": "minecraft:empty",
+                "weight": 4
+              },
+              {
+                "type": "minecraft:item",
+                "functions": [
+                  {
+                    "add": false,
+                    "count": {
+                      "type": "minecraft:uniform",
+                      "max": 6.0,
+                      "min": 2.0
+                    },
+                    "function": "minecraft:set_count"
+                  }
+                ],
+                "name": "doltastic_enchantments:fairy_dust"
+              }
+            ],
+            "name": "doltastic_enchantments:fairy_dust",
+            "rolls": 1.0
+          }
+        ],
+        "replace": false
+      }
+    }
+  ],
+  "priority": "normal",
+  "selector": {
+    "type": "names",
+    "config": [
+      "minecraft:chests/simple_dungeon",
+      "minecraft:chests/ancient_city",
+      "minecraft:chests/nether_bridge",
+      "minecraft:chests/jungle_temple",
+      "minecraft:chests/abandoned_mineshaft",
+      "minecraft:chests/desert_pyramid"
+    ]
+  }
+}

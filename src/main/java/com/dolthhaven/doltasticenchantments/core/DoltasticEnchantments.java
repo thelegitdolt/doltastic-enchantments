@@ -2,6 +2,7 @@ package com.dolthhaven.doltasticenchantments.core;
 
 import com.dolthhaven.doltasticenchantments.client.gui.ClientEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
+import com.dolthhaven.doltasticenchantments.core.data.server.DELootModifiersProvider;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DERecipes;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
@@ -61,6 +62,7 @@ public class DoltasticEnchantments {
         boolean server = event.includeServer();
         dataGen.addProvider(server, new DEEnchantmentTags(event));
         dataGen.addProvider(server, new DERecipes(event));
+        dataGen.addProvider(server, new DELootModifiersProvider(event));
 
         boolean client = event.includeClient();
         dataGen.addProvider(client, new DEItemsModelsGen(event));
