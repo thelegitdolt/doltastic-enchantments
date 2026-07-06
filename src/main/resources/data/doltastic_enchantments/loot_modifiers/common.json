@@ -28,7 +28,7 @@
         "windswept:chests/grove_weathered_house"
 
       ],
-      "weightedBookCount": 0.8
+      "weightedBookCount": 0.7
     },
     {
       "items": [
@@ -57,7 +57,7 @@
         "atmospheric:chests/kousa_sanctum",
         "windswept:chests/grove_weathered_house"
       ],
-      "weightedBookCount": 0.2
+      "weightedBookCount": 0.15
     }
   ]
 }
