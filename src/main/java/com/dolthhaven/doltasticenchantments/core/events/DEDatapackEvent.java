@@ -31,7 +31,7 @@ public class DEDatapackEvent {
                 if ((lootDataId.location().getPath().contains("chests/"))) rlList.add(lootDataId.location());
             }
         });
-        DoltasticEnchantments.LOGGER.info("HELLO from server starting. Also here are all the chest loot tables: {}", EnchantCostUtil.reduceToString(rlList, Function.identity(), ", "));
+//        DoltasticEnchantments.LOGGER.info("HELLO from server starting. Also here are all the chest loot tables: {}", EnchantCostUtil.reduceToString(rlList, Function.identity(), ", "));
         EnchantReagentDatapack.DATAPACK.setServer(event.getServer());
     }
 
