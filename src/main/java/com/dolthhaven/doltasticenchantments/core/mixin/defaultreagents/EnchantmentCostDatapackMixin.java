@@ -70,7 +70,8 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
             holder.unwrapKey().ifPresent(key -> {
                 if (!reg.getCostRegistry().containsKey(key)) {
                     locations.add(key.location());
-                    reg.getCostRegistry().put(key, EnchantCostUtil.createFairyDustCosts(true, EnchantCostUtil.defaultCosts(holder.value().getMaxLevel()), true));
+                    int maxLevel = holder.value().getMaxLevel();
+                    reg.getCostRegistry().put(key, EnchantCostUtil.createFairyDustCosts(true, EnchantCostUtil.defaultCosts(maxLevel), EnchantCostUtil.defaultLevels(maxLevel), true));
                 }
             });
         });
@@ -134,7 +135,7 @@ public class EnchantmentCostDatapackMixin implements RegistryAccessHolder {
         } else {
             dustCosts = EnchantCostUtil.defaultCosts(maxLevel);
         }
-        return EnchantCostUtil.createFairyDustCosts(enabled, dustCosts, unlockedByDefault);
+        return EnchantCostUtil.createFairyDustCosts(enabled, dustCosts, EnchantCostUtil.defaultLevels(maxLevel), unlockedByDefault);
     }
 
     @Unique

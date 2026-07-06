@@ -35,12 +35,13 @@ public class EnchantCostUtil {
         return stringBuilder.toString();
     }
 
-    public static EnchantmentCost createFairyDustCosts(boolean enabled, List<Integer> defaultCosts, boolean unlockedByDefault) {
+    public static EnchantmentCost createFairyDustCosts(boolean enabled, List<Integer> defaultCosts, List<Integer> defaultLevels, boolean unlockedByDefault) {
         Map<String, CostDefinition> levelCosts = new HashMap<>();
 
         for (int i = 1; i <= defaultCosts.size(); i++) {
             int amount = defaultCosts.get(i - 1);
-            CostEntry costEntry = amount == 0 ? CostEntry.EMPTY : new CostEntry(BuiltInRegistries.ITEM.getKey(DEItems.FAIRY_DUST.get()).toString(), "", amount,0);
+            int level = defaultLevels.get(i - 1);
+            CostEntry costEntry = new CostEntry(amount == 0 ? "minecraft:air" : BuiltInRegistries.ITEM.getKey(DEItems.FAIRY_DUST.get()).toString(), "", amount, level);
             levelCosts.put(String.valueOf(i), costEntry);
         }
         EnchantmentCost cost = new EnchantmentCost(levelCosts, enabled);
@@ -53,6 +54,15 @@ public class EnchantCostUtil {
         List<Integer> cost = new ArrayList<>(maxLevel);
         for (int i = 0; i < maxLevel; i++) {
             cost.add(i + 2);
+        }
+        return cost;
+    }
+
+    public static List<Integer> defaultLevels(int maxLevel) {
+        if (maxLevel == 1) return List.of(2);
+        List<Integer> cost = new ArrayList<>(maxLevel);
+        for (int i = 0; i < maxLevel; i++) {
+            cost.add(i + 1);
         }
         return cost;
     }
