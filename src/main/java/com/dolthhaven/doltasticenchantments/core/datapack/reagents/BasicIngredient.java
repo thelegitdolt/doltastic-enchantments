@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+// item predicate class for reagents that may contain a tag or a list of items
 @SuppressWarnings("removal")
 public record BasicIngredient(CostGroup cost, TagKey<Item> tag) {
     public static final CostGroup EMPTY_COST_GROUP = new CostGroup(List.of(), GroupType.ANY_OF);

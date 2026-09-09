@@ -1,8 +1,8 @@
 package com.dolthhaven.doltasticenchantments.core;
 
-import com.dolthhaven.doltasticenchantments.client.gui.ClientEvents;
+import com.dolthhaven.doltasticenchantments.client.ClientEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
-import com.dolthhaven.doltasticenchantments.core.data.server.DELootModifiersProvider;
+import com.dolthhaven.doltasticenchantments.core.data.server.DELootRemolder;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DERecipes;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
@@ -14,29 +14,28 @@ import com.teamabnormals.blueprint.core.util.registry.RegistryHelper;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.slf4j.Logger;
 
-@SuppressWarnings("removal")
 @Mod(DoltasticEnchantments.MOD_ID)
 public class DoltasticEnchantments {
     public static final String MOD_ID = "doltastic_enchantments";
     public static final RegistryHelper REGISTRY_HELPER = new RegistryHelper(MOD_ID);
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public DoltasticEnchantments() {
-        FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
-        IEventBus bus = context.getModEventBus();
+    public DoltasticEnchantments(ModContainer container) {
+        IEventBus bus = container.getEventBus();
 
-        REGISTRY_HELPER.register(bus);
+        DEItems.ITEMS.register(bus);
+
         DELoot.LOOT_MODIFIERS.register(bus);
         DERecipeSerializers.RECIPE_SERIALIZERS.register(bus);
         DEPackets.register();
@@ -45,8 +44,11 @@ public class DoltasticEnchantments {
         bus.addListener(this::dataSetup);
         bus.addListener(ClientEvents::registerInternalEnchantingTooltips);
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> DEItems::setUpTabEditors);
-        MinecraftForge.EVENT_BUS.register(this);
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            DEItems.setUpTabEditors();
+        }
+
+        NeoForge.EVENT_BUS.register(this);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -62,14 +64,14 @@ public class DoltasticEnchantments {
         boolean server = event.includeServer();
         dataGen.addProvider(server, new DEEnchantmentTags(event));
         dataGen.addProvider(server, new DERecipes(event));
-        dataGen.addProvider(server, new DELootModifiersProvider(event));
+        dataGen.addProvider(server, new DELootRemolder(event));
 
         boolean client = event.includeClient();
         dataGen.addProvider(client, new DEItemsModelsGen(event));
     }
 
     public static ResourceLocation rl(String path) {
-        return new ResourceLocation(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static Component translatable(String key) {

@@ -7,10 +7,9 @@ import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
-import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -28,19 +27,18 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
-import net.minecraftforge.common.loot.LootModifier;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.common.loot.LootModifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-@SuppressWarnings("removal")
+// todo: test if removing the conditions thing works
 public class DoltasticBookLootModifier extends LootModifier {
-    public static final Supplier<Codec<DoltasticBookLootModifier>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.create(instance ->
-            codecStart(instance)
+    public static final Supplier<MapCodec<DoltasticBookLootModifier>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.mapCodec(instance ->
+            instance.group(LOOT_CONDITIONS_CODEC.lenientOptionalFieldOf("conditions", new LootItemCondition[0]).forGetter((lm) -> lm.conditions))
                     .and(BookInstance.CODEC.listOf().fieldOf("injections").forGetter(a -> a.booksToInject))
                     .apply(instance, DoltasticBookLootModifier::new)));
 
@@ -74,7 +72,7 @@ public class DoltasticBookLootModifier extends LootModifier {
     }
 
     @Override
-    public Codec<? extends IGlobalLootModifier> codec() {
+    public MapCodec<? extends IGlobalLootModifier> codec() {
         return CODEC.get();
     }
 
@@ -90,8 +88,8 @@ public class DoltasticBookLootModifier extends LootModifier {
                 list.add(Items.DIAMOND_CHESTPLATE);
                 list.add(Items.DIAMOND_LEGGINGS);
                 list.add(Items.DIAMOND_BOOTS);
-                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation("farmersdelight", "diamond_knife"));
-                if (item != null) list.add(item);
+                Item item = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("farmersdelight", "diamond_knife"));
+                if (item != Items.AIR) list.add(item);
             });
         });
 
@@ -127,6 +125,7 @@ public class DoltasticBookLootModifier extends LootModifier {
                             return EnchantCostUtil.requiresBook(cost) && cost.enabled;
                         })
                         // unbreaking only shows up if we are doing commonEnchant
+                        // todo: change to be more general?
                         .filter(enchantment -> !this.commonEnchants || (enchantment.value() != Enchantments.UNBREAKING))
                         .map(a -> (Holder<Enchantment>) a).toList();
                 List<Holder<Enchantment>> allEnchantments = new ArrayList<>(this.enchantments);

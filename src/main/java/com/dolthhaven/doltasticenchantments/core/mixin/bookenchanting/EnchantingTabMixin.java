@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
+// updates the enchanting tab information when more slots are updated for conjuring
 @Mixin(EnchantingTab.class)
 public class EnchantingTabMixin implements ReagentStackHolder {
     @Shadow(remap = false) @Final public EnchantingTableScreen screen;

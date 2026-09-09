@@ -4,7 +4,6 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.EnchantReagentDatapack;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
-import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -19,7 +18,6 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 @Mod.EventBusSubscriber(modid = DoltasticEnchantments.MOD_ID)
 public class DEDatapackEvent {

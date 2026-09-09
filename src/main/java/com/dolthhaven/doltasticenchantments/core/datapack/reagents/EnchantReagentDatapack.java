@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+
 @SuppressWarnings("removal")
 @ParametersAreNonnullByDefault
 public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {

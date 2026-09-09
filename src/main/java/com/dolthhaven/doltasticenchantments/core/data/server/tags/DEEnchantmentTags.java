@@ -2,25 +2,21 @@ package com.dolthhaven.doltasticenchantments.core.data.server.tags;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.data.tags.EnchantmentTagsProvider;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@SuppressWarnings("removal")
-public class DEEnchantmentTags extends IntrinsicHolderTagsProvider<Enchantment> {
+public class DEEnchantmentTags extends EnchantmentTagsProvider {
     public DEEnchantmentTags(GatherDataEvent event) {
-        super(event.getGenerator().getPackOutput(), Registries.ENCHANTMENT, event.getLookupProvider(), enchantment -> ForgeRegistries.ENCHANTMENTS.getResourceKey(enchantment).get(), DoltasticEnchantments.MOD_ID, event.getExistingFileHelper());
+        super(event.getGenerator().getPackOutput(), event.getLookupProvider(), DoltasticEnchantments.MOD_ID, event.getExistingFileHelper());
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(DETags.Enchantments.TREASURE).add(Enchantments.SOUL_SPEED, Enchantments.SWIFT_SNEAK, Enchantments.MENDING)
-                .addOptional(new ResourceLocation("airhop:air_hop"))
-                .addOptional(new ResourceLocation("supplementaries:stasis"))
-                .addOptional(new ResourceLocation("netherexp:phantasm_hull"));
+                .addOptional(ResourceLocation.parse("airhop:air_hop"))
+                .addOptional(ResourceLocation.parse("supplementaries:stasis"))
+                .addOptional(ResourceLocation.parse("netherexp:phantasm_hull"));
     }
 }

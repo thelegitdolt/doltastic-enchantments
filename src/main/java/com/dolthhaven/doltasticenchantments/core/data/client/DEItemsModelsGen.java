@@ -2,7 +2,7 @@ package com.dolthhaven.doltasticenchantments.core.data.client;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.teamabnormals.blueprint.core.data.client.BlueprintItemModelProvider;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import static com.dolthhaven.doltasticenchantments.core.registry.DEItems.FAIRY_DUST;
 
