@@ -1,8 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.networking;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
 
 public class DEPackets {
     private static final String PROTOCOL_VERSION = "1";

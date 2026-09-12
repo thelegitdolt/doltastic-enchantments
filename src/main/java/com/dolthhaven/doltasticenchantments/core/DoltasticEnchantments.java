@@ -25,6 +25,10 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.slf4j.Logger;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.SequencedCollection;
+
 @Mod(DoltasticEnchantments.MOD_ID)
 public class DoltasticEnchantments {
     public static final String MOD_ID = "doltastic_enchantments";

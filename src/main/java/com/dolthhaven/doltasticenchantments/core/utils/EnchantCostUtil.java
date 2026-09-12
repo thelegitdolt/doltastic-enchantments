@@ -2,12 +2,17 @@ package com.dolthhaven.doltasticenchantments.core.utils;
 
 import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
+import me.alfie.alfinolib.util.codec.ItemCost;
+import me.alfie.alfinolib.util.codec.ItemCostIngredient;
 import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
 import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
 import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
 import me.alfie.immersiveenchanting.datapack.cost.EnchantmentCost;
+import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.Cost;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 
@@ -73,5 +78,17 @@ public class EnchantCostUtil {
 
     public static CostEntry basicCost(String item, int xp) {
         return new CostEntry(item, "", 1, xp);
+    }
+
+    public static Cost singleItem(Item item, int xpCost) {
+        return new Cost(new ItemCost(new ItemCostIngredient.SingleItem(item)), xpCost);
+    }
+
+    public static Cost multipleItems(List<Item> items, int xpCost) {
+        return new Cost(new ItemCost(new ItemCostIngredient.ItemList(items)), xpCost);
+    }
+
+    public static Cost tag(TagKey<Item> tag, int xpCost) {
+        return new Cost(new ItemCost(new ItemCostIngredient.TagIngredient(tag)), xpCost);
     }
 }

@@ -2,12 +2,16 @@ package com.dolthhaven.doltasticenchantments.core.utils;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+
+import java.util.Optional;
 
 @SuppressWarnings("removal")
 public class ResourceUtil {
@@ -20,7 +24,7 @@ public class ResourceUtil {
     }
 
     public static boolean isTag(String str) {
-       return str.startsWith("#");
+       return str.startsWith("#") && ResourceLocation.tryParse(str.substring(1)) != null;
     }
 
     public static TagKey<Item> parseTag(String str) {
@@ -42,4 +46,14 @@ public class ResourceUtil {
         return enchantReg.getTag(tag).map(key -> key.contains(holder)).orElse(false);
     }
 
+    public static Optional<Item> getOptionalItem(ResourceLocation location) {
+        if (location.equals(ResourceLocation.withDefaultNamespace("air"))) {
+            return Optional.of(Items.AIR);
+        }
+        Item item = BuiltInRegistries.ITEM.get(location);
+        if (item == Items.AIR) {
+            item = null;
+        }
+        return Optional.ofNullable(item);
+    }
 }

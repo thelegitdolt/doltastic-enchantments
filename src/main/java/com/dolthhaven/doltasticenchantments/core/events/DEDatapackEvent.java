@@ -17,7 +17,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 public class DEDatapackEvent {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void addInModDatapack(AddReloadListenerEvent event) {
-        EnchantReagentDatapack.DATAPACK.setAccess(event.getRegistryAccess());
+        EnchantReagentDatapack.DATAPACK.setRegistry(event.getRegistryAccess());
         event.addListener(EnchantReagentDatapack.DATAPACK);
     }
 

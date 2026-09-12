@@ -8,9 +8,10 @@ import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.dolthhaven.doltasticenchantments.integration.DEReliableRemoverCompat;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -18,11 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -35,59 +32,66 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
     private MinecraftServer server;
-    private RegistryAccess access = null;
+    private Registry<Enchantment> enchantReg;
     private static final String DIRECTORY = "reagent";
     public static final EnchantReagentDatapack DATAPACK = new EnchantReagentDatapack(DIRECTORY);
 
-    public EnchantReagentDatapack(String pDirectory) {
-        super(new Gson(), pDirectory);
+    public EnchantReagentDatapack(String directory) {
+        super(new Gson(), directory);
     }
 
     public void setServer(MinecraftServer server) {
         this.server = server;
     }
 
-    public void setAccess(RegistryAccess access) {
-        this.access = access;
+    public void setRegistry(RegistryAccess access) {
+        enchantReg = access.registryOrThrow(Registries.ENCHANTMENT);
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pathedJsons, ResourceManager resourceManager, ProfilerFiller profiler) {
-        if (access == null) throw new IllegalStateException("Started parsing enchantments without registry access");
-
-        ReagentsRegistry reagentsReg = ReagentsRegistry.server();
-        Registry<Item> itemReg = access.registry(Registries.ITEM).orElse(null);
-        Registry<Enchantment> enchantReg = access.registry(Registries.ENCHANTMENT).orElse(null);
-
-        if (itemReg == null || enchantReg == null) {
-            DoltasticEnchantments.LOGGER.error("Cannot load enchantment reagents; registries are missing");
-            return;
-        }
-
+        ReagentsRegistry reagentsReg = new ReagentsRegistry();
         reagentsReg.clear();
+
         int reagentCount = 0;
         DoltasticEnchantments.LOGGER.info("Loaded {} reagent jsons with paths as follows: {}", pathedJsons.size(),
                 EnchantCostUtil.reduceToString(pathedJsons.keySet(), Function.identity(), ", "));
 
         for (Map.Entry<ResourceLocation, JsonElement> jsonFile : pathedJsons.entrySet()) {
+            ResourceLocation path = jsonFile.getKey();
             for (Map.Entry<String, JsonElement> jsonEntry : jsonFile.getValue().getAsJsonObject().asMap().entrySet()) {
-                ResourceLocation enchant = ResourceLocation.parse(jsonEntry.getKey());
-                BasicIngredient ingredient = BasicIngredient.parseJson(jsonEntry.getValue());
+                Holder<Enchantment> enchant = getEnchantmentOrError(jsonEntry.getKey(), path);
+                if (enchant == null) continue;
 
-                boolean shouldPutNew = validateIDs(enchant, ingredient, jsonFile.getKey(), itemReg, enchantReg)
-                        && calculatePriority(reagentsReg, ResourceUtil.enchant(enchant), ingredient);
+                CostHolder cost = BasicIngredient.parseJsonAndError(jsonEntry.getValue(), path);
+                if (cost == null) continue;
+
+                boolean shouldPutNew = calculatePriority(reagentsReg, enchant, cost);
 
                 if (shouldPutNew) {
-                    reagentCount++;
-                    reagentsReg.put(enchant, ingredient);
+                    if (!reagentsReg.containsKey(enchant)) reagentCount++;
+                    reagentsReg.put(enchant, cost);
                 }
             }
         }
-        DoltasticEnchantments.LOGGER.info("Successfully loaded {} reagents", reagentCount);
+        DoltasticEnchantments.LOGGER.info("Successfully loaded reagents for {} enchantments", reagentCount);
 
 
         syncWithServer();
         logUnreagentedEnchants(this.access);
+    }
+
+    private Holder<Enchantment> getEnchantmentOrError(String str, ResourceLocation path) {
+        ResourceLocation loc = ResourceLocation.tryParse(str);
+        if (loc != null) {
+            Holder<Enchantment> enchantment = enchantReg.getHolder(loc).orElse(null);
+            if (enchantment != null) return enchantment;
+        }
+
+        if (str.contains("comment")) {
+            DoltasticEnchantments.LOGGER.error("Datapack {} contains unregistered enchantment {}", path, str);
+        }
+        return null;
     }
 
     private void syncWithServer() {
@@ -103,18 +107,17 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
         }
     }
 
-    public static void logUnreagentedEnchants(RegistryAccess access) {
-        List<ResourceKey<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
-        access.registry(Registries.ENCHANTMENT).ifPresentOrElse(reg -> reg.holders()
-                .filter(enchantment -> !DoltasticEnchantments.reliableRemover() || !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
-                .forEach(enchantment -> {
-                ResourceKey<Enchantment> enchantKey = enchantment.unwrapKey().orElseThrow();
-                if (!ReagentsRegistry.server().containsKey(enchantKey)) {
-                    boolean doesntRequireBook = !EnchantCostUtil.requiresBook(EnchantmentCostRegistry.getServerRegistry().getEnchantmentCost(enchantKey));
-                    boolean isTreasure = ResourceUtil.isTag(enchantment, DETags.Enchantments.TREASURE, reg);
-                    (doesntRequireBook || isTreasure ? booklessList : missingList).add(enchantKey);
+    public static void logUnreagentedEnchants(Registry<Enchantment> reg) {
+        List<Holder<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
+        reg.holders()
+            .filter(enchantment -> !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
+            .forEach(enchantment -> {
+                if (!ReagentsRegistry.server().containsKey(enchantment)) {
+                    boolean requiresBook = !ResourceUtil.isTag(enchantment, DETags.Enchantments.DOESNT_REQUIRE_BOOKS, reg);
+                    boolean notTreasureEnchant = !ResourceUtil.isTag(enchantment, DETags.Enchantments.TREASURE, reg);
+                    (requiresBook && notTreasureEnchant ?  missingList : booklessList).add(enchantment);
                 }
-            }), () -> DoltasticEnchantments.LOGGER.warn("Could not find registry; this is strange"));
+            });
 
         if (!missingList.isEmpty())
             DoltasticEnchantments.LOGGER.warn("The following enchantments have no associated reagent: {}", EnchantCostUtil.reduceToString(missingList, ResourceKey::location,  ", "));
@@ -122,48 +125,17 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
             DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these are treasure or are bookless: {}", EnchantCostUtil.reduceToString(booklessList, ResourceKey::location, ", "));
     }
 
-    private boolean validateIDs(ResourceLocation enchantKey, BasicIngredient ingredient, ResourceLocation path, Registry<Item> itemReg, Registry<Enchantment> enchantReg) {
-        boolean valid = true;
-        if (!enchantReg.containsKey(enchantKey)) {
-            DoltasticEnchantments.LOGGER.warn("Unknown enchantment {} read in mapping at path {}", enchantKey, path);
-            valid = false;
-        }
-        if (!ingredient.isValid(itemReg, enchantKey, path)) {
-            valid = false;
-        }
-        return valid;
-    }
+    // if there are duplicate entries for a single enchantment, whether to replace an old entry with a new entry
+    // prioritizes an entry with modded IDs, otherwise overwrites
+    private boolean calculatePriority(ReagentsRegistry reagentReg, Holder<Enchantment> enchant, CostHolder ingredient) {
+        if (!reagentReg.containsKey(enchant)) return true;
 
-    private boolean calculatePriority(ReagentsRegistry reagentReg, ResourceKey<Enchantment> enchantKey, BasicIngredient ingredient) {
-        if (!reagentReg.containsKey(enchantKey)) return true;
-
-        BasicIngredient oldItem = reagentReg.get(enchantKey);
-        if (ingredient.hasModdedIds() && !oldItem.hasModdedIds()) {
+        CostHolder oldIng = reagentReg.get(enchant);
+        boolean newIsModded = BasicIngredient.hasModdedIds(ingredient);
+        boolean oldIsModded = BasicIngredient.hasModdedIds(oldIng);
+        // prioritize whichever entry has modded ids
+        if (newIsModded && !oldIsModded) {
             return true;
-        } else return ingredient.hasModdedIds() || !oldItem.hasModdedIds();
-    }
-
-    private static Ingredient parseJson(JsonElement jsonElement) {
-        if (jsonElement.isJsonArray()) {
-            Ingredient ingredient = Ingredient.fromValues(jsonElement.getAsJsonArray().asList().stream().map(JsonElement::getAsString)
-                    .map(str -> {
-                        if (ResourceUtil.isTag(str)) return new Ingredient.TagValue(ResourceUtil.parseTag(str));
-                        else {
-                            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(str));
-                            if (item == Items.AIR) return null;
-                            return new Ingredient.ItemValue(item.getDefaultInstance());
-                        }
-                    }));
-            List<String> items = jsonElement.getAsJsonArray().asList().stream().map(JsonElement::getAsString)
-                    .map(name -> (CostDefinition) new CostEntry(name, "", 1, ENCHANT_COST)).toList();
-            return new BasicIngredient(new CostGroup(items, GroupType.ANY_OF), null);
-        } else {
-            String string = jsonElement.getAsString();
-            if (string.startsWith("#")) {
-                return new BasicIngredient(EMPTY_COST_GROUP, TagKey.create(Registries.ITEM, new ResourceLocation(string.substring(1))));
-            } else {
-                return new BasicIngredient(new CostGroup(List.of(EnchantCostUtil.basicCost(string, 20)), GroupType.ANY_OF), null);
-            }
-        }
+        } else return oldIsModded && !newIsModded;
     }
 }

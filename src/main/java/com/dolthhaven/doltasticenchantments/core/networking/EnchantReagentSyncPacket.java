@@ -19,6 +19,7 @@ public class EnchantReagentSyncPacket {
     private final List<String> enchants;
     private final List<String> items;
 
+
     public EnchantReagentSyncPacket(List<String> enchants, List<String> items) {
         this.enchants = enchants;
         this.items = items;

@@ -4,9 +4,14 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.mojang.datafixers.util.Pair;
+import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -17,14 +22,33 @@ import net.minecraft.world.level.Level;
 import java.util.*;
 
 public class ReagentsRegistry {
-    private static final ReagentsRegistry CLIENT =  new ReagentsRegistry();
-    private static final ReagentsRegistry SERVER_REGISTRY =  new ReagentsRegistry();
+    private final Map<Holder<Enchantment>, CostHolder> register = new HashMap<>();
+    public static final StreamCodec<RegistryFriendlyByteBuf, ReagentsRegistry> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public void encode(RegistryFriendlyByteBuf buf, ReagentsRegistry registry) {
+            buf.writeInt(registry.register.size());
+            for (var entry : registry.register.entrySet()) {
+                buf.writeResourceLocation(entry.getKey().unwrapKey().orElseThrow().location());
+                CostHolder.STREAM_CODEC.encode(buf, entry.getValue());
+            }
+        }
 
-    private final Map<ResourceKey<Enchantment>, BasicIngredient> register = new HashMap<>();
+        @Override
+        public ReagentsRegistry decode(RegistryFriendlyByteBuf buf) {
+            int size = buf.readInt();
+            ReagentsRegistry reagentRegistry = new ReagentsRegistry();
+            Registry<Enchantment> reg = buf.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+            for (int i = 0; i < size; i++) {
+                ResourceLocation rl = buf.readResourceLocation();
+                CostHolder data = CostHolder.STREAM_CODEC.decode(buf);
+                reagentRegistry.register.put(reg.getHolder(rl).orElseThrow(), data);
+            }
+            return reagentRegistry;
+        }
+    };
 
     public static ReagentsRegistry client() {
-        return CLIENT;
-
+        return null;
     }
 
     public static ReagentsRegistry server() {
@@ -39,25 +63,25 @@ public class ReagentsRegistry {
         return level.isClientSide ? client() : server();
     }
 
-    public BasicIngredient get(ResourceKey<Enchantment> enchantment) {
+    public CostHolder get(Holder<Enchantment> enchantment) {
         if (!register.containsKey(enchantment)) return BasicIngredient.EMPTY;
         return register.get(enchantment);
     }
 
-    public BasicIngredient getUnsafe(Holder<Enchantment> enchantment) {
+    public CostHolder getUnsafe(Holder<Enchantment> enchantment) {
         return register.get(enchantment.unwrapKey().orElseThrow());
     }
 
-    public BasicIngredient put(ResourceKey<Enchantment> enchantment, BasicIngredient item) {
+    public CostHolder put(Holder<Enchantment> enchantment, CostHolder item) {
         return register.put(enchantment, item);
     }
 
-    public BasicIngredient put(ResourceLocation enchantment, BasicIngredient item) {
+    public CostHolder put(ResourceLocation enchantment, CostHolder item) {
         return put(ResourceUtil.enchant(enchantment), item);
     }
 
 
-    public boolean containsKey(ResourceKey<Enchantment> enchantment) {
+    public boolean containsKey(Holder<Enchantment> enchantment) {
         return register.containsKey(enchantment);
     }
 
@@ -65,12 +89,12 @@ public class ReagentsRegistry {
         return register.values().stream().anyMatch(ing -> ing.test(stack));
     }
 
-    public Map<ResourceKey<Enchantment>, BasicIngredient> getRegister() {
+    public Map<ResourceKey<Enchantment>, CostHolder> getRegister() {
         return register;
     }
 
     public ResourceKey<Enchantment> getKey(ItemStack stack) {
-        for (Map.Entry<ResourceKey<Enchantment>, BasicIngredient> entry : register.entrySet()) {
+        for (Map.Entry<ResourceKey<Enchantment>, CostHolder> entry : register.entrySet()) {
             if (entry.getValue().test(stack)) {
                 return entry.getKey();
             }
@@ -92,10 +116,10 @@ public class ReagentsRegistry {
     }
 
     public void expandTags() {
-        Set<Pair<ResourceKey<Enchantment>, BasicIngredient>> updatedTags = new HashSet<>();
+        Set<Pair<ResourceKey<Enchantment>, CostHolder>> updatedTags = new HashSet<>();
         for (var iterator = register.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<ResourceKey<Enchantment>, BasicIngredient> entry = iterator.next();
-            BasicIngredient ingredient = entry.getValue();
+            Map.Entry<ResourceKey<Enchantment>, CostHolder> entry = iterator.next();
+            CostHolder ingredient = entry.getValue();
             if (ingredient.isTag()) {
                 Optional<HolderSet.Named<Item>> tags = BuiltInRegistries.ITEM.getTag(ingredient.tag());
                 if (tags.isEmpty() || tags.orElseThrow().size() == 0) {
@@ -103,7 +127,7 @@ public class ReagentsRegistry {
                 } else {
                     iterator.remove();
                     updatedTags.add(Pair.of(entry.getKey(), new BasicIngredient(tags.orElseThrow().stream().map(a ->
-                            EnchantCostUtil.basicCost(a.unwrapKey().orElseThrow().location().toString(), BasicIngredient.ENCHANT_COST)).toList())));
+                            EnchantCostUtil.basicCost(a.unwrapKey().orElseThrow().location().toString(), BasicIngredient.CONJURE_XP_COST)).toList())));
                 }
             }
         }
