@@ -2,6 +2,7 @@ package com.dolthhaven.doltasticenchantments.core.utils;
 
 import me.alfie.immersiveenchanting.item.AncientBook;
 import me.alfie.immersiveenchanting.item.ModItems;
+import me.alfie.immersiveenchanting.util.EnchantmentUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -48,7 +49,7 @@ public class BookUtil {
 
     public static ItemStack newBookWith(Holder<Enchantment> enchant) {
         ItemStack stack = new ItemStack(ModItems.ANCIENT_BOOK.get());
-        AncientBook.setStoredEnchantment(stack, enchant);
+        EnchantmentUtil.setStoredEnchantment(stack, enchant);
         return stack;
     }
 

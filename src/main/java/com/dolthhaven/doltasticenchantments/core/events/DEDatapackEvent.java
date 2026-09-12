@@ -1,7 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.events;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import com.dolthhaven.doltasticenchantments.core.datapack.reagents.EnchantReagentDatapack;
+import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentDatapack;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,8 +17,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 public class DEDatapackEvent {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void addInModDatapack(AddReloadListenerEvent event) {
-        EnchantReagentDatapack.DATAPACK.setRegistry(event.getRegistryAccess());
-        event.addListener(EnchantReagentDatapack.DATAPACK);
+        ReagentDatapack.DATAPACK.setRegistry(event.getRegistryAccess());
+        event.addListener(ReagentDatapack.DATAPACK);
     }
 
     @SubscribeEvent

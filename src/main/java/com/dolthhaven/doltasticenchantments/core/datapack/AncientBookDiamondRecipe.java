@@ -2,6 +2,7 @@ package com.dolthhaven.doltasticenchantments.core.datapack;
 
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.registry.DERecipeSerializers;
+import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
@@ -39,14 +40,10 @@ public class AncientBookDiamondRecipe extends CustomRecipe {
 
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
-        return Items.BIRCH_CHEST_BOAT.getDefaultInstance();
-//        ReagentsRegistry reagents = ReagentsRegistry.server();
-//        reagents = reagents.getRegister().isEmpty() ? reagents : ReagentsRegistry.client();
-//        Optional<HolderLookup.RegistryLookup<Enchantment>> enchantments = registries.lookup(Registries.ENCHANTMENT);
-//        if (enchantments.isEmpty()) return ItemStack.EMPTY;
-//
-//        return BookUtil.newBookWith(enchantments.orElseThrow()
-//                .getHolderOrThrow(reagents.getKey(input.getItem(1))));
+        ReagentsRegistry reagents = ReagentsRegistry.server();
+        reagents = reagents.getRegister().isEmpty() ? reagents : ReagentsRegistry.client();
+
+        return BookUtil.newBookWith(reagents.getValue(input.getItem(1)));
     }
 
     @Override

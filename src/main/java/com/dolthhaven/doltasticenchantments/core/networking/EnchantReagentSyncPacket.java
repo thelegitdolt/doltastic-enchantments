@@ -1,65 +1,65 @@
-package com.dolthhaven.doltasticenchantments.core.networking;
-
-import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import com.dolthhaven.doltasticenchantments.core.datapack.reagents.BasicIngredient;
-import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
-
-import java.util.List;
-import java.util.function.Supplier;
-
-@SuppressWarnings("removal")
-public class EnchantReagentSyncPacket {
-    private final List<String> enchants;
-    private final List<String> items;
-
-
-    public EnchantReagentSyncPacket(List<String> enchants, List<String> items) {
-        this.enchants = enchants;
-        this.items = items;
-    }
-
-    public static void encode(EnchantReagentSyncPacket packet, FriendlyByteBuf buf) {
-        buf.writeCollection(packet.enchants, FriendlyByteBuf::writeUtf);
-        buf.writeCollection(packet.items, FriendlyByteBuf::writeUtf);
-    }
-
-    public static EnchantReagentSyncPacket decode(FriendlyByteBuf buf) {
-        List<String> enchants = buf.readList(FriendlyByteBuf::readUtf);
-        List<String> items = buf.readList(FriendlyByteBuf::readUtf);
-        return new EnchantReagentSyncPacket(enchants, items);
-    }
-
-    public static void handle(EnchantReagentSyncPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-        contextSupplier.get().enqueueWork(() -> {
-            DoltasticEnchantments.LOGGER.info("EnchantmentReagentSyncPacket packet received on client, syncing...");
-            packet.populateClientRegistry();
-        });
-        contextSupplier.get().setPacketHandled(true);
-    }
-
-    private void populateClientRegistry() {
-        if (enchants.size() != items.size()) {
-            throw new IllegalStateException("Enchants and items do not have the same size, cannot deserialize");
-        }
-        ReagentsRegistry registry = ReagentsRegistry.client();
-        registry.clear();
-
-        for (int i  = 0; i < enchants.size(); i++) {
-            registry.put(new ResourceLocation(enchants.get(i)), BasicIngredient.decode(items.get(i)));
-        }
-    }
-
-    public static void sync(ServerPlayer player) {
-        if (!player.level().isClientSide) {
-            Pair<List<String>, List<String>> entryPair = ReagentsRegistry.server().encode();
-            DEPackets.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new EnchantReagentSyncPacket(entryPair.getFirst(), entryPair.getSecond()));
-        }
-    }
-}
+//package com.dolthhaven.doltasticenchantments.core.networking;
+//
+//import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+//import com.dolthhaven.doltasticenchantments.core.datapack.reagents.BasicIngredient;
+//import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
+//import com.mojang.datafixers.util.Pair;
+//import net.minecraft.network.FriendlyByteBuf;
+//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.server.level.ServerPlayer;
+//import net.minecraft.tags.TagKey;
+//import net.minecraftforge.network.NetworkEvent;
+//import net.minecraftforge.network.PacketDistributor;
+//
+//import java.util.List;
+//import java.util.function.Supplier;
+//
+//@SuppressWarnings("removal")
+//public class EnchantReagentSyncPacket {
+//    private final List<String> enchants;
+//    private final List<String> items;
+//
+//
+//    public EnchantReagentSyncPacket(List<String> enchants, List<String> items) {
+//        this.enchants = enchants;
+//        this.items = items;
+//    }
+//
+//    public static void encode(EnchantReagentSyncPacket packet, FriendlyByteBuf buf) {
+//        buf.writeCollection(packet.enchants, FriendlyByteBuf::writeUtf);
+//        buf.writeCollection(packet.items, FriendlyByteBuf::writeUtf);
+//    }
+//
+//    public static EnchantReagentSyncPacket decode(FriendlyByteBuf buf) {
+//        List<String> enchants = buf.readList(FriendlyByteBuf::readUtf);
+//        List<String> items = buf.readList(FriendlyByteBuf::readUtf);
+//        return new EnchantReagentSyncPacket(enchants, items);
+//    }
+//
+//    public static void handle(EnchantReagentSyncPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+//        contextSupplier.get().enqueueWork(() -> {
+//            DoltasticEnchantments.LOGGER.info("EnchantmentReagentSyncPacket packet received on client, syncing...");
+//            packet.populateClientRegistry();
+//        });
+//        contextSupplier.get().setPacketHandled(true);
+//    }
+//
+//    private void populateClientRegistry() {
+//        if (enchants.size() != items.size()) {
+//            throw new IllegalStateException("Enchants and items do not have the same size, cannot deserialize");
+//        }
+//        ReagentsRegistry registry = ReagentsRegistry.client();
+//        registry.clear();
+//
+//        for (int i  = 0; i < enchants.size(); i++) {
+//            registry.put(new ResourceLocation(enchants.get(i)), BasicIngredient.decode(items.get(i)));
+//        }
+//    }
+//
+//    public static void sync(ServerPlayer player) {
+//        if (!player.level().isClientSide) {
+//            Pair<List<String>, List<String>> entryPair = ReagentsRegistry.server().encode();
+//            DEPackets.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new EnchantReagentSyncPacket(entryPair.getFirst(), entryPair.getSecond()));
+//        }
+//    }
+//}

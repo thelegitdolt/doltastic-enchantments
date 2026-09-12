@@ -10,23 +10,23 @@ import me.alfie.alfinolib.util.codec.ItemCostIngredient;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 // item predicate class for reagents that may contain a tag or a list of items
 public record BasicIngredient(CostHolder cost) {
     public static final int CONJURE_XP_COST = 30;
 
     // parses json. Takes in path to create a more helpful error message when there are invalid items
-    public static CostHolder parseJsonAndError(JsonElement element, ResourceLocation path) {
+    public static CostHolder parseJsonAndError(JsonElement element, String enchantment, ResourceLocation path) {
         List<String> possibleCosts = JsonUtil.listOrSingleton(element);
 
         List<Item> itemCosts = new ArrayList<>();
@@ -47,11 +47,15 @@ public record BasicIngredient(CostHolder cost) {
             }
         });
 
-        if (error(illegalStrings, path)) {
+        if (error(illegalStrings, enchantment, path)) {
             return null;
         }
 
         return makeCost(itemCosts, tagCosts);
+    }
+
+    public static boolean test(CostHolder costHolder, ItemStack stack) {
+        return anyMatch(costHolder, stack::is, stack::is);
     }
 
     private static CostHolder makeCost(List<Item> itemCosts, List<TagKey<Item>> tagCosts) {
@@ -63,72 +67,33 @@ public record BasicIngredient(CostHolder cost) {
             }));
     }
 
-    public boolean test(ItemStack stack) {
-        if (isItems() && cost == EMPTY_COST_GROUP) return true;
-        if (isTag()) {
-            return stack.is(tag);
-        } else {
-            for (CostDefinition definition : cost.children()) {
-                if (definition instanceof CostEntry entry) {
-                    if (stack.is(entry.asItem())) {
-                        return true;
-                    }
-                } else throw new IllegalStateException("BasicIngredients.cost can only be nested one layer");
-            }
-        } return false;
-    }
-
-    public String encodeAsString() {
-        if (isItems()) {
-            return "[" + EnchantCostUtil.reduceToString(this.castedCost(), CostEntry::item, ",") +  "]";
-        } else {
-            return "#" + tag.location();
-        }
-    }
-
-    public static BasicIngredient decode(String bytes) {
-        if (bytes.startsWith("#")) {
-            return new BasicIngredient(EMPTY_COST_GROUP, TagKey.create(Registries.ITEM, new ResourceLocation(bytes.substring(1))));
-        } else {
-            return new BasicIngredient(new CostGroup(Arrays.stream(bytes.substring(1, bytes.length() - 1).split(",")).map(thing ->
-                    (CostDefinition) EnchantCostUtil.basicCost(thing, CONJURE_XP_COST)).toList(), GroupType.ANY_OF), null);
-        }
-    }
-
-    public static boolean error(List<String> illegalItems, ResourceLocation filePath) {
+    public static boolean error(List<String> illegalItems, String enchantment, ResourceLocation filePath) {
         if (!illegalItems.isEmpty()) {
-            DoltasticEnchantments.LOGGER.warn("Tried to associate invalid items {} to enchantment {} in {}, aborting", EnchantCostUtil.reduceToString(illegalItems, Function.identity(), ", "), enchantment, filePath);
+            DoltasticEnchantments.LOGGER.warn("Tried to associate invalid item {} to enchantment {} in {}, aborting", EnchantCostUtil.reduceToString(illegalItems, Function.identity(), ", "), enchantment, filePath);
             return false;
         }
         return true;
     }
 
     public static boolean hasModdedIds(CostHolder data) {
+        return anyMatch(data, item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft"), tag -> tag.location().getNamespace().equals("minecraft"));
+    }
+
+    public static boolean allMatch(CostHolder data, Predicate<Item> itemPred, Predicate<TagKey<Item>> tagPred) {
+        return anyMatch(data, Predicate.not(itemPred), Predicate.not(tagPred));
+    }
+
+    public static boolean anyMatch(CostHolder data, Predicate<Item> itemPred, Predicate<TagKey<Item>> tagPred) {
         return data.costs().stream().anyMatch(cost -> {
             ItemCostIngredient itemCostIngredient = cost.itemCost().ingredient();
-            if (itemCostIngredient instanceof ItemCostIngredient.TagIngredient(TagKey<Item> tag)) return tag.location().getNamespace().equals("minecraft");
+
+            if (itemCostIngredient instanceof ItemCostIngredient.TagIngredient(TagKey<Item> tag)) return tagPred.test(tag);
             else if (itemCostIngredient instanceof ItemCostIngredient.ItemList(List<Item> list))
-                return list.stream().anyMatch(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft"));
+                return list.stream().anyMatch(itemPred);
             else if (itemCostIngredient instanceof ItemCostIngredient.SingleItem(Item item))
-                return BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft");
+                return itemPred.test(item);
 
             throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
         });
-    }
-
-    public boolean isTag() {
-        return tag != null;
-    }
-
-    public boolean isItems() {
-        return tag == null;
-    }
-
-    public List<CostEntry> castedCost() {
-        try {
-            return cost.children().stream().map(CostEntry.class::cast).toList();
-        } catch (ClassCastException exception) {
-            throw new IllegalStateException("The children of BasicIngredients.cost must be Cost Entries, no nesting is permitted");
-        }
     }
 }

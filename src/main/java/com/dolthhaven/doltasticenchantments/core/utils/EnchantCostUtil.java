@@ -1,6 +1,5 @@
 package com.dolthhaven.doltasticenchantments.core.utils;
 
-import com.dolthhaven.doltasticenchantments.core.datapack.DefaultEnchantmentHolder;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import me.alfie.alfinolib.util.codec.ItemCost;
 import me.alfie.alfinolib.util.codec.ItemCostIngredient;

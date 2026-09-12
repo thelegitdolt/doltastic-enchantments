@@ -2,23 +2,21 @@ package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
-import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.dolthhaven.doltasticenchantments.integration.DEReliableRemoverCompat;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import me.alfie.alfinolib.datapacks.DatapackDefinition;
+import me.alfie.alfinolib.datapacks.DatapackKey;
+import me.alfie.alfinolib.datapacks.ModDatapack;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.enchantment.Enchantment;
 
@@ -30,22 +28,25 @@ import java.util.function.Function;
 
 
 @ParametersAreNonnullByDefault
-public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
-    private MinecraftServer server;
-    private Registry<Enchantment> enchantReg;
-    private static final String DIRECTORY = "reagent";
-    public static final EnchantReagentDatapack DATAPACK = new EnchantReagentDatapack(DIRECTORY);
+public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
+    public static final DatapackKey<ReagentsRegistry> KEY = new DatapackKey<>(DoltasticEnchantments.MOD_ID, "reagent");
+    public static final DatapackDefinition<ReagentsRegistry> DEFINITION = new DatapackDefinition<>(KEY, ReagentsRegistry.STREAM_CODEC);
 
-    public EnchantReagentDatapack(String directory) {
-        super(new Gson(), directory);
+    private MinecraftServer server;
+    private final Registry<Enchantment> enchantReg;
+
+    public ReagentDatapack(RegistryAccess access) {
+        super(CostHolder.CODEC, DEFINITION, access);
+        enchantReg = access.registryOrThrow(Registries.ENCHANTMENT);
     }
 
     public void setServer(MinecraftServer server) {
         this.server = server;
     }
 
-    public void setRegistry(RegistryAccess access) {
-        enchantReg = access.registryOrThrow(Registries.ENCHANTMENT);
+    @Override
+    public ReagentsRegistry getData() {
+        return null;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
                 Holder<Enchantment> enchant = getEnchantmentOrError(jsonEntry.getKey(), path);
                 if (enchant == null) continue;
 
-                CostHolder cost = BasicIngredient.parseJsonAndError(jsonEntry.getValue(), path);
+                CostHolder cost = BasicIngredient.parseJsonAndError(jsonEntry.getValue(), jsonEntry.getKey(), path);
                 if (cost == null) continue;
 
                 boolean shouldPutNew = calculatePriority(reagentsReg, enchant, cost);
@@ -77,8 +78,8 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
         DoltasticEnchantments.LOGGER.info("Successfully loaded reagents for {} enchantments", reagentCount);
 
 
-        syncWithServer();
-        logUnreagentedEnchants(this.access);
+//        syncWithServer();
+        logUnreagentedEnchants(this.enchantReg);
     }
 
     private Holder<Enchantment> getEnchantmentOrError(String str, ResourceLocation path) {
@@ -94,18 +95,18 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
         return null;
     }
 
-    private void syncWithServer() {
-        if (this.server != null) {
-            int count = 0;
-
-            for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
-                EnchantReagentSyncPacket.sync(player);
-                ++count;
-            }
-
-            DoltasticEnchantments.LOGGER.info("Synced server enchantment reagent registry with {} client(s).", count);
-        }
-    }
+//    private void syncWithServer() {
+//        if (this.server != null) {
+//            int count = 0;
+//
+//            for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
+//                EnchantReagentSyncPacket.sync(player);
+//                ++count;
+//            }
+//
+//            DoltasticEnchantments.LOGGER.info("Synced server enchantment reagent registry with {} client(s).", count);
+//        }
+//    }
 
     public static void logUnreagentedEnchants(Registry<Enchantment> reg) {
         List<Holder<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
@@ -120,9 +121,9 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
             });
 
         if (!missingList.isEmpty())
-            DoltasticEnchantments.LOGGER.warn("The following enchantments have no associated reagent: {}", EnchantCostUtil.reduceToString(missingList, ResourceKey::location,  ", "));
+            DoltasticEnchantments.LOGGER.warn("The following enchantments have no associated reagent: {}", EnchantCostUtil.reduceToString(missingList, holder -> holder.unwrapKey().orElseThrow().location(),  ", "));
         if (!booklessList.isEmpty())
-            DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these are treasure or are bookless: {}", EnchantCostUtil.reduceToString(booklessList, ResourceKey::location, ", "));
+            DoltasticEnchantments.LOGGER.info("The following enchantments have no associated reagent, but this is fine because these are treasure or are bookless: {}", EnchantCostUtil.reduceToString(booklessList, holder -> holder.unwrapKey().orElseThrow().location(), ", "));
     }
 
     // if there are duplicate entries for a single enchantment, whether to replace an old entry with a new entry

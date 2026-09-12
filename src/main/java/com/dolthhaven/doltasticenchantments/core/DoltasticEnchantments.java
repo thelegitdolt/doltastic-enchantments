@@ -5,12 +5,14 @@ import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.DELootRemolder;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DERecipes;
+import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentDatapack;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
 import com.dolthhaven.doltasticenchantments.core.registry.DERecipeSerializers;
 import com.mojang.logging.LogUtils;
 import com.teamabnormals.blueprint.core.util.registry.RegistryHelper;
+import me.alfie.alfinolib.datapacks.DatapackRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,15 +21,10 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.slf4j.Logger;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.SequencedCollection;
 
 @Mod(DoltasticEnchantments.MOD_ID)
 public class DoltasticEnchantments {
@@ -42,10 +39,13 @@ public class DoltasticEnchantments {
 
         DELoot.LOOT_MODIFIERS.register(bus);
         DERecipeSerializers.RECIPE_SERIALIZERS.register(bus);
-        DEPackets.register();
+
+        DatapackRegistry.register(ReagentDatapack.DEFINITION, ReagentDatapack::new);
 
         bus.addListener(this::dataSetup);
+        bus.addListener(this::dataSetup);
         bus.addListener(ClientEvents::registerInternalEnchantingTooltips);
+        bus.addListener(DEPackets::register);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DEItems.setUpTabEditors();
