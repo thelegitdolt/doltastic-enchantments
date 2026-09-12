@@ -4,6 +4,7 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
+import com.dolthhaven.doltasticenchantments.integration.DEReliableRemoverCompat;
 import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
@@ -114,7 +115,7 @@ public class DoltasticBookLootModifier extends LootModifier {
                                 items.stream().anyMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
                         // not treasure or removed by reliable remover
                         .filter(enchantment -> {
-                            if (DoltasticEnchantments.reliableRemover() && DEReliableRemoverCompat.isEnchantmentRemoved(enchantment.value())) return false;
+                            if (DEReliableRemoverCompat.isEnchantmentRemoved(enchantment)) return false;
                             var enchantReg = registry.getTag(DETags.Enchantments.TREASURE);
                             if (enchantReg.isEmpty()) return true;
                             else return !enchantReg.orElseThrow().contains(enchantment);

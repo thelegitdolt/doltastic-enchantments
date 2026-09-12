@@ -5,12 +5,12 @@ import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.networking.EnchantReagentSyncPacket;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
-import com.dolthhaven.doltasticenchantments.integration.emi.DEReliableRemoverCompat;
+import com.dolthhaven.doltasticenchantments.integration.DEReliableRemoverCompat;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import me.alfie.immersiveenchanting.datapack.EnchantmentCostRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -18,8 +18,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,7 +32,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 
-@SuppressWarnings("removal")
 @ParametersAreNonnullByDefault
 public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
     private MinecraftServer server;
@@ -69,7 +71,7 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
 
         for (Map.Entry<ResourceLocation, JsonElement> jsonFile : pathedJsons.entrySet()) {
             for (Map.Entry<String, JsonElement> jsonEntry : jsonFile.getValue().getAsJsonObject().asMap().entrySet()) {
-                ResourceLocation enchant = new ResourceLocation(jsonEntry.getKey());
+                ResourceLocation enchant = ResourceLocation.parse(jsonEntry.getKey());
                 BasicIngredient ingredient = BasicIngredient.parseJson(jsonEntry.getValue());
 
                 boolean shouldPutNew = validateIDs(enchant, ingredient, jsonFile.getKey(), itemReg, enchantReg)
@@ -104,7 +106,7 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
     public static void logUnreagentedEnchants(RegistryAccess access) {
         List<ResourceKey<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
         access.registry(Registries.ENCHANTMENT).ifPresentOrElse(reg -> reg.holders()
-                .filter(enchantment -> !DoltasticEnchantments.reliableRemover() || !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment.value()))
+                .filter(enchantment -> !DoltasticEnchantments.reliableRemover() || !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
                 .forEach(enchantment -> {
                 ResourceKey<Enchantment> enchantKey = enchantment.unwrapKey().orElseThrow();
                 if (!ReagentsRegistry.server().containsKey(enchantKey)) {
@@ -139,5 +141,29 @@ public class EnchantReagentDatapack extends SimpleJsonResourceReloadListener {
         if (ingredient.hasModdedIds() && !oldItem.hasModdedIds()) {
             return true;
         } else return ingredient.hasModdedIds() || !oldItem.hasModdedIds();
+    }
+
+    private static Ingredient parseJson(JsonElement jsonElement) {
+        if (jsonElement.isJsonArray()) {
+            Ingredient ingredient = Ingredient.fromValues(jsonElement.getAsJsonArray().asList().stream().map(JsonElement::getAsString)
+                    .map(str -> {
+                        if (ResourceUtil.isTag(str)) return new Ingredient.TagValue(ResourceUtil.parseTag(str));
+                        else {
+                            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(str));
+                            if (item == Items.AIR) return null;
+                            return new Ingredient.ItemValue(item.getDefaultInstance());
+                        }
+                    }));
+            List<String> items = jsonElement.getAsJsonArray().asList().stream().map(JsonElement::getAsString)
+                    .map(name -> (CostDefinition) new CostEntry(name, "", 1, ENCHANT_COST)).toList();
+            return new BasicIngredient(new CostGroup(items, GroupType.ANY_OF), null);
+        } else {
+            String string = jsonElement.getAsString();
+            if (string.startsWith("#")) {
+                return new BasicIngredient(EMPTY_COST_GROUP, TagKey.create(Registries.ITEM, new ResourceLocation(string.substring(1))));
+            } else {
+                return new BasicIngredient(new CostGroup(List.of(EnchantCostUtil.basicCost(string, 20)), GroupType.ANY_OF), null);
+            }
+        }
     }
 }

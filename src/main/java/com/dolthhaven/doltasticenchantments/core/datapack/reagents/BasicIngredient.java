@@ -4,10 +4,8 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.google.gson.JsonElement;
-import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
-import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
-import me.alfie.immersiveenchanting.datapack.cost.CostGroup;
-import me.alfie.immersiveenchanting.datapack.cost.GroupType;
+import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostData;
+import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -21,15 +19,8 @@ import java.util.List;
 import java.util.function.Function;
 
 // item predicate class for reagents that may contain a tag or a list of items
-@SuppressWarnings("removal")
-public record BasicIngredient(CostGroup cost, TagKey<Item> tag) {
-    public static final CostGroup EMPTY_COST_GROUP = new CostGroup(List.of(), GroupType.ANY_OF);
+public record BasicIngredient(CostData cost) {
     public static final int ENCHANT_COST = 20;
-    public static final BasicIngredient EMPTY = new BasicIngredient(EMPTY_COST_GROUP, null);
-
-    public BasicIngredient(List<CostEntry> costEntries) {
-        this(new CostGroup(costEntries.stream().map(CostDefinition.class::cast).toList(), GroupType.ANY_OF), null);
-    }
 
     public boolean test(ItemStack stack) {
         if (isItems() && cost == EMPTY_COST_GROUP) return true;
@@ -42,7 +33,6 @@ public record BasicIngredient(CostGroup cost, TagKey<Item> tag) {
                         return true;
                     }
                 } else throw new IllegalStateException("BasicIngredients.cost can only be nested one layer");
-
             }
         } return false;
     }

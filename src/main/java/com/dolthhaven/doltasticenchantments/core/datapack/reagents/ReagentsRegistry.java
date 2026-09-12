@@ -24,6 +24,7 @@ public class ReagentsRegistry {
 
     public static ReagentsRegistry client() {
         return CLIENT;
+
     }
 
     public static ReagentsRegistry server() {

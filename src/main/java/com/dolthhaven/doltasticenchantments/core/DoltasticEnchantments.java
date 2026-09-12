@@ -40,7 +40,6 @@ public class DoltasticEnchantments {
         DERecipeSerializers.RECIPE_SERIALIZERS.register(bus);
         DEPackets.register();
 
-        bus.addListener(this::commonSetup);
         bus.addListener(this::dataSetup);
         bus.addListener(ClientEvents::registerInternalEnchantingTooltips);
 
@@ -49,10 +48,6 @@ public class DoltasticEnchantments {
         }
 
         NeoForge.EVENT_BUS.register(this);
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-
     }
 
     public static boolean reliableRemover() {

@@ -13,7 +13,6 @@ import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
-import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
 import me.alfie.immersiveenchanting.item.ModItems;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -34,7 +33,7 @@ import java.util.stream.Stream;
 public class DEEmiPlugin implements EmiPlugin {
     @Override
     public void register(EmiRegistry emiRegistry) {
-        emiRegistry.setDefaultComparison(ModItems.ANCIENT_BOOK.get(), Comparison.compareNbt());
+        emiRegistry.setDefaultComparison(ModItems.ANCIENT_BOOK.get(), Comparison.compareComponents());
 
         for (CraftingRecipe recipe : getRecipes(emiRegistry, RecipeType.CRAFTING)) {
             if (recipe instanceof AncientBookDiamondRecipe) {

@@ -19,12 +19,23 @@ public class ResourceUtil {
         return ResourceKey.create(Registries.ENCHANTMENT, location);
     }
 
+    public static boolean isTag(String str) {
+       return str.startsWith("#");
+    }
+
+    public static TagKey<Item> parseTag(String str) {
+        if (!isTag(str)) {
+            throw new IllegalArgumentException("Not a real tag doesn't start with #");
+        }
+        return TagKey.create(Registries.ITEM, ResourceLocation.parse(str.substring(1)));
+    }
+
     public static ResourceKey<Item> sitem(String location) {
-        return item(new ResourceLocation(location));
+        return item(ResourceLocation.parse(location));
     }
 
     public static ResourceKey<Enchantment> senchant(String location) {
-        return enchant(new ResourceLocation(location));
+        return enchant(ResourceLocation.parse(location));
     }
 
     public static boolean isTag(Holder<Enchantment> holder, TagKey<Enchantment> tag, Registry<Enchantment> enchantReg) {
