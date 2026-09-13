@@ -16,7 +16,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -33,27 +32,23 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
     public static final DatapackKey<ReagentsRegistry> KEY = new DatapackKey<>(DoltasticEnchantments.MOD_ID, "reagent");
     public static final DatapackDefinition<ReagentsRegistry> DEFINITION = new DatapackDefinition<>(KEY, ReagentsRegistry.STREAM_CODEC);
 
-    private MinecraftServer server;
-    private final Registry<Enchantment> enchantReg;
+    private ReagentsRegistry Data = null;
+    private final RegistryAccess access;
 
     public ReagentDatapack(RegistryAccess access) {
         super(CostHolder.CODEC, DEFINITION, access);
-        enchantReg = access.registryOrThrow(Registries.ENCHANTMENT);
-    }
-
-    public void setServer(MinecraftServer server) {
-        this.server = server;
+        this.access = access;
     }
 
     @Override
     public ReagentsRegistry getData() {
-        return null;
+        return Data;
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pathedJsons, ResourceManager resourceManager, ProfilerFiller profiler) {
         ReagentsRegistry reagentsReg = new ReagentsRegistry();
-        reagentsReg.clear();
+        this.Data = reagentsReg;
 
         int reagentCount = 0;
         DoltasticEnchantments.LOGGER.info("Loaded {} reagent jsons with paths as follows: {}", pathedJsons.size(),
@@ -80,17 +75,17 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
 
 
 //        syncWithServer();
-        logUnreagentedEnchants(this.enchantReg);
+        logUnreagentedEnchants(reagentsReg);
     }
 
     private Holder<Enchantment> getEnchantmentOrError(String str, ResourceLocation path) {
         ResourceLocation loc = ResourceLocation.tryParse(str);
         if (loc != null) {
-            Holder<Enchantment> enchantment = enchantReg.getHolder(loc).orElse(null);
+            Holder<Enchantment> enchantment = reg().getHolder(ResourceUtil.enchant(loc)).orElse(null);
             if (enchantment != null) return enchantment;
         }
 
-        if (str.contains("comment")) {
+        if (!str.contains("comment")) {
             DoltasticEnchantments.LOGGER.error("Datapack {} contains unregistered enchantment {}", path, str);
         }
         return null;
@@ -109,14 +104,14 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
 //        }
 //    }
 
-    public static void logUnreagentedEnchants(Registry<Enchantment> reg) {
+    public void logUnreagentedEnchants(ReagentsRegistry registry) {
         List<Holder<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
-        reg.holders()
+        reg().holders()
             .filter(enchantment -> !DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
             .forEach(enchantment -> {
-                if (!ReagentsRegistry.server().containsKey(enchantment)) {
-                    boolean requiresBook = !ResourceUtil.isTag(enchantment, DETags.Enchantments.DOESNT_REQUIRE_BOOKS, reg);
-                    boolean notTreasureEnchant = !ResourceUtil.isTag(enchantment, DETags.Enchantments.TREASURE, reg);
+                if (!registry.containsKey(enchantment)) {
+                    boolean requiresBook = !ResourceUtil.isTag(enchantment, DETags.Enchantments.DOESNT_REQUIRE_BOOKS, reg());
+                    boolean notTreasureEnchant = !ResourceUtil.isTag(enchantment, DETags.Enchantments.TREASURE, reg());
                     (requiresBook && notTreasureEnchant ?  missingList : booklessList).add(enchantment);
                 }
             });
@@ -139,5 +134,9 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
         if (newIsModded && !oldIsModded) {
             return true;
         } else return oldIsModded && !newIsModded;
+    }
+
+    private Registry<Enchantment> reg() {
+        return access.registryOrThrow(Registries.ENCHANTMENT);
     }
 }

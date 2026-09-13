@@ -64,9 +64,9 @@ public class CostHolderUtils {
     public static boolean error(List<String> illegalItems, String enchantment, ResourceLocation filePath) {
         if (!illegalItems.isEmpty()) {
             DoltasticEnchantments.LOGGER.warn("Tried to associate invalid item {} to enchantment {} in {}, aborting", EnchantCostUtil.reduceToString(illegalItems, Function.identity(), ", "), enchantment, filePath);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static boolean hasModdedIds(CostHolder data) {
