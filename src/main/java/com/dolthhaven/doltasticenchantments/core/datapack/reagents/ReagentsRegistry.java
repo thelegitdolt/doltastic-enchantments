@@ -1,5 +1,6 @@
 package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
+import com.dolthhaven.doltasticenchantments.core.utils.CostHolderUtils;
 import me.alfie.alfinolib.datapacks.client.ClientDatapackManager;
 import me.alfie.alfinolib.datapacks.server.ServerDatapackManager;
 import me.alfie.alfinolib.networking.codec.StreamCodec;
@@ -65,7 +66,7 @@ public class ReagentsRegistry {
 
     public Holder<Enchantment> getValue(ItemStack stack) {
         for (var enchantAndCost : register.entrySet()) {
-            if (BasicIngredient.test(enchantAndCost.getValue(), stack)) {
+            if (CostHolderUtils.test(enchantAndCost.getValue(), stack)) {
                 return enchantAndCost.getKey();
             }
         }
@@ -85,7 +86,7 @@ public class ReagentsRegistry {
     }
 
     public boolean containsValue(ItemStack stack) {
-        return register.values().stream().anyMatch(cost -> BasicIngredient.test(cost, stack));
+        return register.values().stream().anyMatch(cost -> CostHolderUtils.test(cost, stack));
     }
 
     public Map<Holder<Enchantment>, CostHolder> getRegister() {

@@ -1,16 +1,11 @@
-package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
+package com.dolthhaven.doltasticenchantments.core.utils;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-import com.dolthhaven.doltasticenchantments.core.utils.CSE20Util;
-import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.JsonUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.google.gson.JsonElement;
 import me.alfie.alfinolib.util.codec.ItemCostIngredient;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -21,8 +16,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-// item predicate class for reagents that may contain a tag or a list of items
-public record BasicIngredient(CostHolder cost) {
+public class CostHolderUtils {
     public static final int CONJURE_XP_COST = 30;
 
     // parses json. Takes in path to create a more helpful error message when there are invalid items
@@ -60,11 +54,11 @@ public record BasicIngredient(CostHolder cost) {
 
     private static CostHolder makeCost(List<Item> itemCosts, List<TagKey<Item>> tagCosts) {
         return new CostHolder(Util.make(new ArrayList<>(), list -> {
-                CSE20Util.tryUnwrapSingleton(itemCosts)
-                        .ifPresentOrElse(item -> list.add(EnchantCostUtil.singleItem(item, CONJURE_XP_COST)),
-                                () -> list.add(EnchantCostUtil.multipleItems(itemCosts, CONJURE_XP_COST)));
-                tagCosts.forEach(tag -> list.add(EnchantCostUtil.tag(tag, CONJURE_XP_COST)));
-            }));
+            CSE20Util.tryUnwrapSingleton(itemCosts)
+                    .ifPresentOrElse(item -> list.add(EnchantCostUtil.singleItem(item, CONJURE_XP_COST)),
+                            () -> list.add(EnchantCostUtil.multipleItems(itemCosts, CONJURE_XP_COST)));
+            tagCosts.forEach(tag -> list.add(EnchantCostUtil.tag(tag, CONJURE_XP_COST)));
+        }));
     }
 
     public static boolean error(List<String> illegalItems, String enchantment, ResourceLocation filePath) {
@@ -95,5 +89,21 @@ public record BasicIngredient(CostHolder cost) {
 
             throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
         });
+    }
+
+    public static <T> List<T> map(CostHolder data, Function<? super Item, T> itemOps, Function<? super TagKey<Item>, T> tagOps) {
+        List<T> list = new ArrayList<>();
+        data.costs().forEach(cost -> {
+            ItemCostIngredient itemCostIngredient = cost.itemCost().ingredient();
+
+            if (itemCostIngredient instanceof ItemCostIngredient.TagIngredient(TagKey<Item> tag)) list.add(tagOps.apply(tag));
+            else if (itemCostIngredient instanceof ItemCostIngredient.ItemList(List<Item> itemList))
+                itemList.stream().map(itemOps).forEach(list::add);
+            else if (itemCostIngredient instanceof ItemCostIngredient.SingleItem(Item item))
+                list.add(itemOps.apply(item));
+
+            throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
+        });
+        return list;
     }
 }
