@@ -1,6 +1,5 @@
 package com.dolthhaven.doltasticenchantments.core;
 
-import com.dolthhaven.doltasticenchantments.client.ClientEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.DELootRemolder;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
@@ -18,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -43,21 +43,19 @@ public class DoltasticEnchantments {
         DatapackRegistry.register(ReagentDatapack.DEFINITION, ReagentDatapack::new);
 
         bus.addListener(this::dataSetup);
-        bus.addListener(this::dataSetup);
-        bus.addListener(ClientEvents::registerInternalEnchantingTooltips);
+//        bus.addListener(ClientEvents::registerInternalEnchantingTooltips);
         bus.addListener(DEPackets::register);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DEItems.setUpTabEditors();
         }
-
-        NeoForge.EVENT_BUS.register(this);
     }
 
     public static boolean reliableRemover() {
         return ModList.get().isLoaded("reliable_remover");
     }
 
+    @SubscribeEvent
     private void dataSetup(final GatherDataEvent event) {
         DataGenerator dataGen = event.getGenerator();
         boolean server = event.includeServer();

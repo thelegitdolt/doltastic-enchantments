@@ -1,4 +1,4 @@
-// 1.20.1	2026-04-22T11:32:23.701915	Recipes
-2de46fa1b0ff027c57b9d88460c06a30cfb95d3c data/doltastic_enchantments/advancements/recipes/misc/fairy_dust.json
-0272d66a04cb2072ca16c1fe122a446b185d479c data/doltastic_enchantments/recipes/ancient_book_from_diamonds.json
-4f816466f96df17f91d55767209dee08c1d2f4b1 data/doltastic_enchantments/recipes/fairy_dust.json
+// 1.21.1	2026-09-13T07:42:06.22756	Recipes
+de49f933d5036c13b70df821ca2b1b6dbc7add17 data/doltastic_enchantments/advancement/recipes/misc/fairy_dust.json
+0272d66a04cb2072ca16c1fe122a446b185d479c data/doltastic_enchantments/recipe/ancient_book_from_diamonds.json
+4677d9b5f6790ea02424996afac4b4212b99a27c data/doltastic_enchantments/recipe/fairy_dust.json
