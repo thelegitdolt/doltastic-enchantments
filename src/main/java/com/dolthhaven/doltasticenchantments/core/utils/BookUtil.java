@@ -12,21 +12,9 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import java.util.List;
 
 public class BookUtil {
-//    public static List<ResourceKey<Enchantment>> getAllStoredEnchantments(ItemStack bookStack) {
-//        List<ResourceKey<Enchantment>> enchants = new ArrayList<>();
-//
-//        ListTag listTag = EnchantedBookItem.getEnchantments(bookStack);
-//        if (!listTag.isEmpty()) {
-//            for (Tag tag : listTag) {
-//                if (tag instanceof CompoundTag compoundTag) {
-//                    ResourceLocation enchantmentRL = ResourceLocation.tryParse(compoundTag.getString("id"));
-//                    if (enchantmentRL == null) continue;
-//                    enchants.add(ResourceKey.create(Registries.ENCHANTMENT, enchantmentRL));
-//                }
-//            }
-//        }
-//        return enchants;
-//    }
+    public static Iterable<Holder<Enchantment>> getAllStoredEnchantments(ItemStack bookStack) {
+        return bookStack.getComponents().get(DataComponents.STORED_ENCHANTMENTS).keySet();
+    }
 
     public static ItemStack newBookWith(List<Holder<Enchantment>> enchants) {
         ItemStack stack = new ItemStack(ModItems.ANCIENT_BOOK.get());
