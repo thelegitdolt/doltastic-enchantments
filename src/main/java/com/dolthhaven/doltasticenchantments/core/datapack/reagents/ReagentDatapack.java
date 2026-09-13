@@ -2,7 +2,6 @@ package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
-import com.dolthhaven.doltasticenchantments.core.utils.CostHolderUtils;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
 import com.dolthhaven.doltasticenchantments.integration.DEReliableRemoverCompat;
@@ -60,7 +59,7 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
                 Holder<Enchantment> enchant = getEnchantmentOrError(jsonEntry.getKey(), path);
                 if (enchant == null) continue;
 
-                CostHolder cost = CostHolderUtils.parseJsonAndError(jsonEntry.getValue(), jsonEntry.getKey(), path);
+                CostHolder cost = EnchantCostUtil.parseJsonAndError(jsonEntry.getValue(), jsonEntry.getKey(), path);
                 if (cost == null) continue;
 
                 boolean shouldPutNew = calculatePriority(reagentsReg, enchant, cost);
@@ -115,10 +114,10 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
         if (!reagentReg.containsKey(enchant)) return true;
 
         CostHolder oldIng = reagentReg.get(enchant);
-        boolean newIsModded = CostHolderUtils.hasModdedIds(ingredient);
-        boolean oldIsModded = CostHolderUtils.hasModdedIds(oldIng);
-        boolean oldEmpty = CostHolderUtils.isEmpty(oldIng);
-        boolean newEmpty = CostHolderUtils.isEmpty(ingredient);
+        boolean newIsModded = EnchantCostUtil.hasModdedIds(ingredient);
+        boolean oldIsModded = EnchantCostUtil.hasModdedIds(oldIng);
+        boolean oldEmpty = EnchantCostUtil.isEmpty(oldIng);
+        boolean newEmpty = EnchantCostUtil.isEmpty(ingredient);
         if (newEmpty) return false;
         if (oldEmpty) return true;
 

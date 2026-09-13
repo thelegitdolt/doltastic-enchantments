@@ -4,7 +4,7 @@ import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.datapack.AncientBookDiamondRecipe;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
-import com.dolthhaven.doltasticenchantments.core.utils.CostHolderUtils;
+import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import dev.emi.emi.api.EmiEntrypoint;
 import dev.emi.emi.api.EmiPlugin;
 import dev.emi.emi.api.EmiRegistry;
@@ -45,6 +45,6 @@ public class DEEmiPlugin implements EmiPlugin {
     }
 
     private static EmiIngredient toEmiIngredient(CostHolder ingredient) {
-        return EmiIngredient.of(CostHolderUtils.map(ingredient, EmiStack::of, EmiIngredient::of));
+        return EmiIngredient.of(EnchantCostUtil.map(ingredient, EmiStack::of, EmiIngredient::of));
     }
 }

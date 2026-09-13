@@ -13,7 +13,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.Optional;
 
-@SuppressWarnings("removal")
 public class ResourceUtil {
     public static ResourceKey<Item> item(ResourceLocation location) {
         return ResourceKey.create(Registries.ITEM, location);

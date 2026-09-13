@@ -1,13 +1,12 @@
 package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
-import com.dolthhaven.doltasticenchantments.core.utils.CostHolderUtils;
+import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import me.alfie.alfinolib.datapacks.client.ClientDatapackManager;
 import me.alfie.alfinolib.datapacks.server.ServerDatapackManager;
 import me.alfie.alfinolib.networking.codec.StreamCodec;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +66,7 @@ public class ReagentsRegistry {
 
     public Holder<Enchantment> getValue(ItemStack stack) {
         for (var enchantAndCost : register.entrySet()) {
-            if (CostHolderUtils.test(enchantAndCost.getValue(), stack)) {
+            if (EnchantCostUtil.test(enchantAndCost.getValue(), stack)) {
                 return enchantAndCost.getKey();
             }
         }
@@ -87,7 +86,7 @@ public class ReagentsRegistry {
     }
 
     public boolean containsValue(ItemStack stack) {
-        return register.values().stream().anyMatch(cost -> CostHolderUtils.test(cost, stack));
+        return register.values().stream().anyMatch(cost -> EnchantCostUtil.test(cost, stack));
     }
 
     public Map<Holder<Enchantment>, CostHolder> getRegister() {
