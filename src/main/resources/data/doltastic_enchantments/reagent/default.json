@@ -14,7 +14,7 @@
     "minecraft:knockback": "stick",
     "minecraft:looting": "leather",
     "minecraft:loyalty": "feather",
-    "minecraft:multishot": "prismarine_shard",
+    "minecraft:multishot": "melon_seeds",
     "minecraft:piercing": "ender_pearl",
     "minecraft:projectile_protection": "minecraft:bone",
     "minecraft:quick_charge": "minecraft:redstone",
@@ -27,6 +27,9 @@
     "minecraft:unbreaking": "obsidian",
     "minecraft:vanishing_curse": "fermented_spider_eye",
     "minecraft:flame": "charcoal",
+    "minecraft:wind_burst": "wind_charge",
+    "minecraft:density": "minecraft:pointed_dripstone",
+    "minecraft:breach": "minecraft:prismarine_shard",
     "minecraft:luck_of_the_sea": "salmon",
     "minecraft:punch": "piston"
 }
