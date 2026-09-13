@@ -7,6 +7,7 @@ import me.alfie.alfinolib.networking.codec.StreamCodec;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ReagentsRegistry {
-    private final Map<Holder<Enchantment>, CostHolder> register = new HashMap<>();
+    private Map<Holder<Enchantment>, CostHolder> register = new HashMap<>();
     public static final StreamCodec<RegistryFriendlyByteBuf, ReagentsRegistry> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public void encode(RegistryFriendlyByteBuf buf, ReagentsRegistry registry) {
@@ -92,23 +93,4 @@ public class ReagentsRegistry {
     public Map<Holder<Enchantment>, CostHolder> getRegister() {
         return register;
     }
-
-//    public void expandTags() {
-//        Set<Pair<ResourceKey<Enchantment>, CostHolder>> updatedTags = new HashSet<>();
-//        for (var iterator = register.entrySet().iterator(); iterator.hasNext(); ) {
-//            Map.Entry<ResourceKey<Enchantment>, CostHolder> entry = iterator.next();
-//            CostHolder ingredient = entry.getValue();
-//            if (ingredient.isTag()) {
-//                Optional<HolderSet.Named<Item>> tags = BuiltInRegistries.ITEM.getTag(ingredient.tag());
-//                if (tags.isEmpty() || tags.orElseThrow().size() == 0) {
-//                    DoltasticEnchantments.LOGGER.info("Associated empty tag {} as reagent of enchantment {}, this is an error in your scripts", ingredient.tag().location(), entry.getKey());
-//                } else {
-//                    iterator.remove();
-//                    updatedTags.add(Pair.of(entry.getKey(), new BasicIngredient(tags.orElseThrow().stream().map(a ->
-//                            EnchantCostUtil.basicCost(a.unwrapKey().orElseThrow().location().toString(), BasicIngredient.CONJURE_XP_COST)).toList())));
-//                }
-//            }
-//        }
-//        updatedTags.forEach(pair -> this.put(pair.getFirst(), pair.getSecond()));
-//    }
 }

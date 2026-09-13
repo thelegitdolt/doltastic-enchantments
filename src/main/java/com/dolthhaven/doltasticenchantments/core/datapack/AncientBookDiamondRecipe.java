@@ -41,8 +41,6 @@ public class AncientBookDiamondRecipe extends CustomRecipe {
     @Override
     public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
         ReagentsRegistry reagents = ReagentsRegistry.server();
-        reagents = reagents.getRegister().isEmpty() ? reagents : ReagentsRegistry.client();
-
         return BookUtil.newBookWith(reagents.getValue(input.getItem(1)));
     }
 

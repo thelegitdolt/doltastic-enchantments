@@ -3,6 +3,7 @@ package com.dolthhaven.doltasticenchantments.core.utils;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.google.gson.JsonElement;
 import me.alfie.alfinolib.util.codec.ItemCostIngredient;
+import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.Cost;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -73,6 +74,16 @@ public class CostHolderUtils {
         return anyMatch(data, item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals("minecraft"), tag -> tag.location().getNamespace().equals("minecraft"));
     }
 
+    public static boolean isEmpty(CostHolder data) {
+        for (Cost cost : data.costs()) {
+            ItemCostIngredient ing = cost.itemCost().ingredient();
+            if (ing instanceof ItemCostIngredient.SingleItem(Item item) && item != null) return false;
+            if (ing instanceof ItemCostIngredient.ItemList(List<Item> list) && !list.isEmpty()) return false;
+            if (ing instanceof ItemCostIngredient.TagIngredient(TagKey<Item> tag) && BuiltInRegistries.ITEM.getTag(tag).map(named -> named.size() > 0).orElse(false)) return false;
+        }
+        return true;
+    }
+
     public static boolean allMatch(CostHolder data, Predicate<Item> itemPred, Predicate<TagKey<Item>> tagPred) {
         return anyMatch(data, Predicate.not(itemPred), Predicate.not(tagPred));
     }
@@ -81,13 +92,13 @@ public class CostHolderUtils {
         return data.costs().stream().anyMatch(cost -> {
             ItemCostIngredient itemCostIngredient = cost.itemCost().ingredient();
 
-            if (itemCostIngredient instanceof ItemCostIngredient.TagIngredient(TagKey<Item> tag)) return tagPred.test(tag);
-            else if (itemCostIngredient instanceof ItemCostIngredient.ItemList(List<Item> list))
-                return list.stream().anyMatch(itemPred);
-            else if (itemCostIngredient instanceof ItemCostIngredient.SingleItem(Item item))
-                return itemPred.test(item);
-
-            throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
+            return switch (itemCostIngredient) {
+                case ItemCostIngredient.TagIngredient(TagKey<Item> tag) -> tagPred.test(tag);
+                case ItemCostIngredient.ItemList(List<Item> list) -> list.stream().anyMatch(itemPred);
+                case ItemCostIngredient.SingleItem(Item item) -> itemPred.test(item);
+                default ->
+                        throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
+            };
         });
     }
 
@@ -96,13 +107,14 @@ public class CostHolderUtils {
         data.costs().forEach(cost -> {
             ItemCostIngredient itemCostIngredient = cost.itemCost().ingredient();
 
-            if (itemCostIngredient instanceof ItemCostIngredient.TagIngredient(TagKey<Item> tag)) list.add(tagOps.apply(tag));
-            else if (itemCostIngredient instanceof ItemCostIngredient.ItemList(List<Item> itemList))
-                itemList.stream().map(itemOps).forEach(list::add);
-            else if (itemCostIngredient instanceof ItemCostIngredient.SingleItem(Item item))
-                list.add(itemOps.apply(item));
-
-            throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
+            switch (itemCostIngredient) {
+                case ItemCostIngredient.TagIngredient(TagKey<Item> tag) -> list.add(tagOps.apply(tag));
+                case ItemCostIngredient.ItemList(List<Item> itemList) ->
+                        itemList.stream().map(itemOps).forEach(list::add);
+                case ItemCostIngredient.SingleItem(Item item) -> list.add(itemOps.apply(item));
+                default ->
+                        throw new IllegalStateException("Found instance of ItemCostIngredient that's not any of the three possible subclasses");
+            }
         });
         return list;
     }

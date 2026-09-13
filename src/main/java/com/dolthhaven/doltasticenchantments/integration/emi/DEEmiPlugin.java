@@ -36,7 +36,8 @@ public class DEEmiPlugin implements EmiPlugin {
                                   book = EmiStack.of(Items.BOOK);
                     EmiStack ancientBook = EmiStack.of(BookUtil.newBookWith(enchant));
 
-                    emiRegistry.addRecipe(new EmiCraftingRecipe(List.of(diamond, reagent, diamond, diamond, book, diamond, diamond, diamond, diamond), ancientBook, recipe.id()));
+                    emiRegistry.addRecipe(new EmiCraftingRecipe(List.of(diamond, reagent, diamond, diamond, book, diamond, diamond, diamond, diamond), ancientBook,
+                            recipe.id().withSuffix("/" + enchant.unwrapKey().orElseThrow().location().toString().replace(":", "_"))));
                 });
                 break;
             }

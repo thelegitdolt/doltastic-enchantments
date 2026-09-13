@@ -91,19 +91,6 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
         return null;
     }
 
-//    private void syncWithServer() {
-//        if (this.server != null) {
-//            int count = 0;
-//
-//            for (ServerPlayer player : this.server.getPlayerList().getPlayers()) {
-//                EnchantReagentSyncPacket.sync(player);
-//                ++count;
-//            }
-//
-//            DoltasticEnchantments.LOGGER.info("Synced server enchantment reagent registry with {} client(s).", count);
-//        }
-//    }
-
     public void logUnreagentedEnchants(ReagentsRegistry registry) {
         List<Holder<Enchantment>> missingList = new ArrayList<>(), booklessList = new ArrayList<>();
         reg().holders()
@@ -130,6 +117,11 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
         CostHolder oldIng = reagentReg.get(enchant);
         boolean newIsModded = CostHolderUtils.hasModdedIds(ingredient);
         boolean oldIsModded = CostHolderUtils.hasModdedIds(oldIng);
+        boolean oldEmpty = CostHolderUtils.isEmpty(oldIng);
+        boolean newEmpty = CostHolderUtils.isEmpty(ingredient);
+        if (newEmpty) return false;
+        if (oldEmpty) return true;
+
         // prioritize whichever entry has modded ids
         if (newIsModded && !oldIsModded) {
             return true;
