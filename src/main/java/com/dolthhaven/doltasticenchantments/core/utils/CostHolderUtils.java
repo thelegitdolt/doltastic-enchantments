@@ -53,7 +53,7 @@ public class CostHolderUtils {
         return anyMatch(costHolder, stack::is, stack::is);
     }
 
-    private static CostHolder makeCost(List<Item> itemCosts, List<TagKey<Item>> tagCosts) {
+    public static CostHolder makeCost(List<Item> itemCosts, List<TagKey<Item>> tagCosts) {
         return new CostHolder(Util.make(new ArrayList<>(), list -> {
             CSE20Util.tryUnwrapSingleton(itemCosts)
                     .ifPresentOrElse(item -> list.add(EnchantCostUtil.singleItem(item, CONJURE_XP_COST)),
