@@ -1,0 +1,37 @@
+{
+  "molding": "json",
+  "remolder": {
+    "type": "add",
+    "target": "pools[]",
+    "value": {
+      "bonus_rolls": 0.0,
+      "entries": [],
+      "functions": [
+        {
+          "add": false,
+          "count": {
+            "type": "minecraft:uniform",
+            "max": 3.0,
+            "min": 1.0
+          },
+          "function": "minecraft:set_count"
+        }
+      ],
+      "name": "dust",
+      "rolls": {
+        "type": "minecraft:uniform",
+        "max": 1.0,
+        "min": -1.0
+      }
+    }
+  },
+  "selector": {
+    "type": "multi",
+    "config": [
+      "minecraft:loot_table/",
+      "minecraft:loot_table/",
+      "minecraft:loot_table/",
+      "minecraft:loot_table/"
+    ]
+  }
+}
