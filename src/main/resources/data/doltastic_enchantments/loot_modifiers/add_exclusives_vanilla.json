@@ -12,7 +12,20 @@
         "minecraft:chests/underwater_ruin_big",
         "minecraft:chests/buried_treasure"
       ],
-      "weightedBookCount": 0.3
+      "weightedBookCount": 0.15
+    },
+    {
+      "items": [
+        "minecraft:mace"
+      ],
+      "butNot": [
+        "minecraft:diamond_sword"
+      ],
+      "tables": [
+        "minecraft:chests/trial_chambers/reward",
+        "minecraft:chests/trial_chambers/reward_ominous"
+      ],
+      "weightedBookCount": 0.10
     },
     {
       "enchantments": [
@@ -22,7 +35,7 @@
       "tables": [
         "minecraft:chests/abandoned_mineshaft"
       ],
-      "weightedBookCount": 0.15
+      "weightedBookCount": 0.10
     },
     {
       "enchantments": [
@@ -43,7 +56,7 @@
         "minecraft:chests/bastion_treasure",
         "minecraft:chests/bastion_hoglin_stable"
       ],
-      "weightedBookCount": 0.09
+      "weightedBookCount": 0.10
     }
   ]
 }

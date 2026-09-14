@@ -2,7 +2,11 @@
   "type": "doltastic_enchantments:ancient_book",
   "injections": [
     {
-      "commonEnchants": true, 
+      "commonEnchants": true,
+      "items": [
+        "minecraft:crossbow",
+        "minecraft:bow"
+      ],
       "tables": [
         "minecraft:chests/underwater_ruin_small",
         "minecraft:chests/stronghold_corridor",
@@ -28,7 +32,19 @@
         "autumnity:chests/maple_hut",
         "galosphere:chests/pink_salt_shrine"
       ],
-      "weightedBookCount": 0.30
+      "weightedBookCount": 0.10
+    },
+    {
+      "commonEnchants": true,
+      "items": [
+        "minecraft:crossbow",
+        "minecraft:bow"
+      ],
+      "tables": [
+        "minecraft:chests/trial_chambers/reward",
+        "minecraft:chests/trial_chambers/reward_ominous"
+      ],
+      "weightedBookCount": 0.05
     },
     {
       "items": [

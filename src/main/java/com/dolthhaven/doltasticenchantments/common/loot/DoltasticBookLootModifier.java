@@ -27,6 +27,7 @@ import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -75,7 +76,7 @@ public class DoltasticBookLootModifier extends LootModifier {
         return CODEC.get();
     }
 
-    public record BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount, List<Holder<Enchantment>> derivedPool) {
+    public record BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, HolderSet<Item> butNot, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount, List<Holder<Enchantment>> derivedPool) {
         private static final Supplier<List<Item>> COMMON_ITEMS = Suppliers.memoize(() -> {
             return Util.make(new ArrayList<>(), list -> {
                 list.add(Items.DIAMOND_PICKAXE);
@@ -95,14 +96,15 @@ public class DoltasticBookLootModifier extends LootModifier {
         public static final Codec<BookInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 RegistryCodecs.homogeneousList(Registries.ENCHANTMENT).optionalFieldOf("enchantments", HolderSet.empty()).forGetter(BookInstance::enchantments),
                 RegistryCodecs.homogeneousList(Registries.ITEM).optionalFieldOf("items", HolderSet.empty()).forGetter(BookInstance::items),
+                RegistryCodecs.homogeneousList(Registries.ITEM).optionalFieldOf("butNot", HolderSet.empty()).forGetter(BookInstance::items),
                 Codec.BOOL.optionalFieldOf("commonEnchants", false).forGetter(BookInstance::commonEnchants),
                 ResourceLocation.CODEC.listOf().fieldOf("tables").forGetter(BookInstance::tables),
                 Codec.FLOAT.fieldOf("weightedBookCount").forGetter(BookInstance::weight),
                 UniformInt.CODEC.fieldOf("enchantCount").orElse(UniformInt.of(1, 2)).forGetter(BookInstance::sampleCount)
         ).apply(instance, BookInstance::new));
 
-        public BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount) {
-            this(enchantments, items, commonEnchants, tables, weight, sampleCount, new ArrayList<>());
+        public BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, HolderSet<Item> butNot, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount) {
+            this(enchantments, items, butNot, commonEnchants, tables, weight, sampleCount, new ArrayList<>());
         }
 
         public List<Holder<Enchantment>> getEnchantments(Level level) {
@@ -118,11 +120,13 @@ public class DoltasticBookLootModifier extends LootModifier {
             Registry<Enchantment> registry = access.registryOrThrow(Registries.ENCHANTMENT);
             if (items.size() == 0 && !commonEnchants) return enchantments.stream().toList();
             else {
-                List<Item> items = commonEnchants ? COMMON_ITEMS.get() : this.items.stream().map(Holder::value).toList();
+                List<Item> items = new ArrayList<>(this.items.stream().map(Holder::value).toList());
+                if (commonEnchants) items.addAll(COMMON_ITEMS.get());
                 List<Holder.Reference<Enchantment>> holders = registry.holders()
                         // the actual filter
                         .filter(enchantment ->
-                                items.stream().anyMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
+                                items.stream().anyMatch(item -> enchantment.value().canEnchant(item.getDefaultInstance())) &&
+                                butNot.stream().noneMatch(item -> enchantment.value().canEnchant(new ItemStack(item))))
                         // not treasure or removed by reliable remover
                         .filter(enchantment -> {
                             if (DEReliableRemoverCompat.isEnchantmentRemoved(enchantment)) return false;
