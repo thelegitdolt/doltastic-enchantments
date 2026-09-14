@@ -21,6 +21,10 @@
       "butNot": [
         "minecraft:diamond_sword"
       ],
+      "enchantCount": {
+        "min_inclusive": 1,
+        "max_inclusive": 1
+      },
       "tables": [
         "minecraft:chests/trial_chambers/reward",
         "minecraft:chests/trial_chambers/reward_ominous"
