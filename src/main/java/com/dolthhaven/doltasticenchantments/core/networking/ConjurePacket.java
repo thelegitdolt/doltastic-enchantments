@@ -1,58 +1,34 @@
-//package com.dolthhaven.doltasticenchantments.core.networking;
-//
-//import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
-//import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
-//import com.dolthhaven.doltasticenchantments.core.utils.BookUtil;
-//import com.dolthhaven.doltasticenchantments.core.utils.ResourceUtil;
-//import me.alfie.immersiveenchanting.datapack.cost.CostDefinition;
-//import me.alfie.immersiveenchanting.datapack.cost.CostEntry;
-//import me.alfie.immersiveenchanting.gui.EnchantingTableMenu;
-//import me.alfie.immersiveenchanting.util.CostHelper;
-//import me.alfie.immersiveenchanting.util.FxHelper;
-//import net.minecraft.advancements.CriteriaTriggers;
-//import net.minecraft.core.Registry;
-//import net.minecraft.core.registries.Registries;
-//import net.minecraft.network.FriendlyByteBuf;
-//import net.minecraft.resources.ResourceKey;
-//import net.minecraft.server.level.ServerPlayer;
-//import net.minecraft.stats.Stats;
-//import net.minecraft.world.item.ItemStack;
-//import net.minecraft.world.item.Items;
-//import net.minecraft.world.item.enchantment.Enchantment;
-//import net.minecraftforge.network.NetworkEvent;
-//import org.jetbrains.annotations.NotNull;
-//
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.function.Supplier;
-//
-//public class ConjurePacket {
-//    private static final CostEntry TWENTY_LEVELS = new CostEntry("minecraft:air", "", 0, 20);
-//    private final String enchant;
-//
-//    public ConjurePacket(String enchant) {
-//        this.enchant = enchant;
-//    }
-//
-//    public static void encode(ConjurePacket packet, FriendlyByteBuf buf) {
-//        buf.writeUtf(packet.enchant);
-//    }
-//
-//    public static ConjurePacket decode(FriendlyByteBuf buf) {
-//        String enchant = buf.readUtf();
-//        return new ConjurePacket(enchant);
-//    }
-//
-//    public static void handle(ConjurePacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
-//        contextSupplier.get().enqueueWork(() -> {
-//            DoltasticEnchantments.LOGGER.info("ConjurePacket packet received from client, conjuring...");
-//            exec(contextSupplier.get(), packet.enchant);
-//        });
-//        contextSupplier.get().setPacketHandled(true);
-//    }
-//
-//    private static void exec(NetworkEvent.Context ctx, String enchantmentString) {
-//        ServerPlayer player = ctx.getSender();
+package com.dolthhaven.doltasticenchantments.core.networking;
+
+import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+import me.alfie.alfinolib.networking.NetworkPacket;
+import me.alfie.alfinolib.networking.codec.StreamCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+public record ConjurePacket(String enchantment) implements NetworkPacket<ConjurePacket> {
+    public static final CustomPacketPayload.Type<ConjurePacket> TYPE = new CustomPacketPayload.Type<>(DoltasticEnchantments.rl("replicate"));
+    public static StreamCodec<RegistryFriendlyByteBuf, ConjurePacket> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public void encode(RegistryFriendlyByteBuf registryFriendlyByteBuf, ConjurePacket replicatePacket) {
+
+        }
+
+        @Override
+        public ConjurePacket decode(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+            return new ConjurePacket("sex");
+        }
+    };
+
+    @Override
+    public CustomPacketPayload.Type<ConjurePacket> type() {
+        return TYPE;
+    }
+
+    @Override
+    public void exec(IPayloadContext ctx) {
+//        ServerPlayer player = ctx.player();
 //        ResourceKey<Enchantment> enchantKey = ResourceUtil.senchant(enchantmentString);
 //        Optional<Registry<Enchantment>> registry = player.level().registryAccess().registry(Registries.ENCHANTMENT);
 //        if (registry.isEmpty()) return;
@@ -78,11 +54,6 @@
 //                FxHelper.playEnchantFailFx(player.level(), menu.getBlockPos());
 //            }
 //        }
-//    }
-//
-//    private static @NotNull CostDefinition getCost(ResourceKey<Enchantment> enchantKey) {
-//        return ReagentsRegistry.server().get(enchantKey).cost();
-//    }
-//
-//}
-//
+    }
+}
+
