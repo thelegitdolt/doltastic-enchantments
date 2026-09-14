@@ -28,54 +28,36 @@ import net.neoforged.neoforge.common.loot.LootModifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 // todo: test if removing the conditions thing works
 public class DoltasticBookLootModifier extends LootModifier {
     public static final Supplier<MapCodec<DoltasticBookLootModifier>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.mapCodec(instance ->
             instance.group(LOOT_CONDITIONS_CODEC.lenientOptionalFieldOf("conditions", new LootItemCondition[0]).forGetter((lm) -> lm.conditions))
-                    .and(BookInstance.CODEC.listOf().xmap(bookInstances -> {
-                              Map<BookInstance, List<Holder<Enchantment>>> newMap = new HashMap<>();
-                              return Util.make(newMap, map -> bookInstances.forEach(bi -> map.put(bi, null)));
-                            }, map -> {
-                                return map.keySet().stream().toList();
-                            }).fieldOf("injections").forGetter(book -> book.booksToInject))
+                    .and(BookInstance.CODEC.listOf().fieldOf("injections").forGetter(book -> book.booksToInject))
                     .apply(instance, DoltasticBookLootModifier::new)));
 
-    private final Map<BookInstance, List<Holder<Enchantment>>> booksToInject;
+    private final List<BookInstance> booksToInject;
 
     /**
      * Constructs a LootModifier.
      *
      * @param conditionsIn the ILootConditions that need to be matched before the loot is modified.
      */
-    protected DoltasticBookLootModifier(LootItemCondition[] conditionsIn, Map<BookInstance, List<Holder<Enchantment>>> booksToInject) {
+    protected DoltasticBookLootModifier(LootItemCondition[] conditionsIn, List<BookInstance> booksToInject) {
         super(conditionsIn);
         this.booksToInject = booksToInject;
     }
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        List<Consumer<Map<BookInstance, List<Holder<Enchantment>>>>> toUpdate = new ArrayList<>();
-        for (var bookPair : booksToInject.entrySet()) {
-            BookInstance instance = bookPair.getKey();
+        for (BookInstance instance : booksToInject) {
             RandomSource random = context.getRandom();
 
             if (!instance.tables.contains(context.getQueriedLootTableId())) continue;
-            for (int i = 0; i < blackBoxNormalizationFunctionWithExpectedValueEqualToTheFloat(instance.weight, context.getRandom()); i++) {
-                List<Holder<Enchantment>> enchantPool;
-
-                if (bookPair.getValue() == null) {
-                    enchantPool = bookPair.getKey().getEnchantments(context.getLevel());
-                    toUpdate.add(map -> map.put(bookPair.getKey(), enchantPool));
-                } else {
-                    enchantPool = bookPair.getValue();
-                }
-
+            for (int i = 0; i < getBookCount(instance.weight, context.getRandom()); i++) {
+                List<Holder<Enchantment>> enchantPool = instance.getEnchantments(context.getLevel());
                 List<Holder<Enchantment>> toApply = sample(instance
                         .getEnchantments(context.getLevel()), instance.sampleCount.sample(random), random);;
 
@@ -85,7 +67,6 @@ public class DoltasticBookLootModifier extends LootModifier {
                 generatedLoot.add(book);
             }
         }
-        toUpdate.forEach(consumer -> consumer.accept(booksToInject));
         return generatedLoot;
     }
 
@@ -94,7 +75,7 @@ public class DoltasticBookLootModifier extends LootModifier {
         return CODEC.get();
     }
 
-    public record BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount) {
+    public record BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount, List<Holder<Enchantment>> derivedPool) {
         private static final Supplier<List<Item>> COMMON_ITEMS = Suppliers.memoize(() -> {
             return Util.make(new ArrayList<>(), list -> {
                 list.add(Items.DIAMOND_PICKAXE);
@@ -120,7 +101,19 @@ public class DoltasticBookLootModifier extends LootModifier {
                 UniformInt.CODEC.fieldOf("enchantCount").orElse(UniformInt.of(1, 2)).forGetter(BookInstance::sampleCount)
         ).apply(instance, BookInstance::new));
 
+        public BookInstance(HolderSet<Enchantment> enchantments, HolderSet<Item> items, boolean commonEnchants, List<ResourceLocation> tables, float weight, UniformInt sampleCount) {
+            this(enchantments, items, commonEnchants, tables, weight, sampleCount, new ArrayList<>());
+        }
+
         public List<Holder<Enchantment>> getEnchantments(Level level) {
+            if (this.derivedPool.isEmpty()) {
+                List<Holder<Enchantment>> pool = computeEnchantments(level);
+                derivedPool.addAll(pool);
+            }
+            return derivedPool;
+        }
+
+        private List<Holder<Enchantment>> computeEnchantments(Level level) {
             RegistryAccess access = level.registryAccess();
             Registry<Enchantment> registry = access.registryOrThrow(Registries.ENCHANTMENT);
             if (items.size() == 0 && !commonEnchants) return enchantments.stream().toList();
@@ -165,7 +158,7 @@ public class DoltasticBookLootModifier extends LootModifier {
         return sampled;
     }
 
-    public static int blackBoxNormalizationFunctionWithExpectedValueEqualToTheFloat(float thing, RandomSource random) {
+    public static int getBookCount(float thing, RandomSource random) {
         if (thing < 1) {
             return random.nextDouble() < thing ? 1 : 0;
         }
