@@ -1,6 +1,5 @@
 {
   "type": "doltastic_enchantments:ancient_book",
-  "conditions": [],
   "injections": [
     {
       "commonEnchants": true, 
@@ -28,7 +27,7 @@
         "windswept:chests/grove_weathered_house"
 
       ],
-      "weightedBookCount": 0.7
+      "weightedBookCount": 0.5
     },
     {
       "items": [
@@ -57,7 +56,7 @@
         "atmospheric:chests/kousa_sanctum",
         "windswept:chests/grove_weathered_house"
       ],
-      "weightedBookCount": 0.15
+      "weightedBookCount": 0.2
     }
   ]
 }

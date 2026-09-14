@@ -1,6 +1,5 @@
 {
   "type": "doltastic_enchantments:ancient_book",
-  "conditions": [],
   "injections": [
     {
       "commonEnchants": true, 
@@ -29,7 +28,7 @@
         "autumnity:chests/maple_hut",
         "galosphere:chests/pink_salt_shrine"
       ],
-      "weightedBookCount": 0.40
+      "weightedBookCount": 0.30
     },
     {
       "items": [
@@ -48,7 +47,7 @@
 
         "environmental:chests/log_cabin"
       ],
-      "weightedBookCount": 0.10
+      "weightedBookCount": 0.15
     }
   ]
 }

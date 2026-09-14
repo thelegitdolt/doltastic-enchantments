@@ -8,6 +8,10 @@
       "required": false
     },
     {
+      "id": "allurement:reforming",
+      "required": false
+    },
+    {
       "id": "supplementaries:stasis",
       "required": false
     },

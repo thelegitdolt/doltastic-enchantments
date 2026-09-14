@@ -17,9 +17,11 @@ public class DEEnchantmentTags extends EnchantmentTagsProvider {
     protected void addTags(HolderLookup.Provider provider) {
         tag(DETags.Enchantments.TREASURE).add(SOUL_SPEED, SWIFT_SNEAK, MENDING)
                 .addOptional(ResourceLocation.parse("airhop:air_hop"))
+                .addOptional(ResourceLocation.parse("allurement:reforming"))
                 .addOptional(ResourceLocation.parse("supplementaries:stasis"))
                 .addOptional(ResourceLocation.parse("netherexp:phantasm_hull"));
 
+        tag(DETags.Enchantments.UNIVERSAL_ENCHANTS).add(VANISHING_CURSE, BINDING_CURSE, UNBREAKING);
         tag(DETags.Enchantments.DOESNT_REQUIRE_BOOKS).add(EFFICIENCY, IMPALING, LURE, POWER, PROTECTION, SILK_TOUCH, SWEEPING_EDGE);
     }
 }

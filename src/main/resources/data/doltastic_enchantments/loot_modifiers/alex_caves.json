@@ -1,6 +1,5 @@
 {
   "type": "doltastic_enchantments:ancient_book",
-  "conditions": [],
   "injections": [
     {
       "weightedBookCount": 0.6,
