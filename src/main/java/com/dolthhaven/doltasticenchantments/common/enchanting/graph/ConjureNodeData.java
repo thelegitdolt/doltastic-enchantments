@@ -22,7 +22,7 @@ public record ConjureNodeData(ResourceId enchantmentId) implements NodePayload {
     public static NodeData<ConjureNodeData> create(ResourceId enchantment) {
         ResourceId withSuffix = isNull(enchantment) ? EMPTY : new ResourceId(enchantment.namespace(), enchantment.path() + FLAG);
         return new NodeData<>(TYPE, new ConjureNodeData(withSuffix), (data, context) ->
-                Networking.sendToServer(new ConjurePacket("sex")));
+                Networking.sendToServer(new ConjurePacket(enchantment.mc())));
     }
 
     public static ResourceId unwrapFlag(ResourceId id) {
