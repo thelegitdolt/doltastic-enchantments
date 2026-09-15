@@ -3,6 +3,7 @@ package com.dolthhaven.doltasticenchantments.common.enchanting;
 import com.dolthhaven.doltasticenchantments.common.enchanting.graph.ConjureNodeData;
 import com.dolthhaven.doltasticenchantments.common.enchanting.tooltip.ConjureLayoutExtension;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DETags;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentsRegistry;
 import me.alfie.alfinolib.util.ResourceId;
 import me.alfie.immersiveenchanting.api.description.RegisterDescriptionLayoutEvent;
@@ -14,14 +15,14 @@ import me.alfie.immersiveenchanting.util.EnchantmentTextureHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import static java.util.Objects.isNull;
 
 public class EnchantingMenuEvents {
     public static void addDoltBranches(BuildBranchesEvent event) {
-        if (event.getStack().is(Items.BOOK)) {
+        if (event.getStack().is(DETags.Items.CONJURE_BASES)) {
+            event.getBranches().clear();
             buildConjureBranch(event);
         }
     }

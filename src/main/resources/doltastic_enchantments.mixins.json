@@ -9,7 +9,7 @@
     "CostDatapackMixin",
     "CostRendererMixin",
     "CreativeEventsMixin",
-    "EnchantingTableMenuMixin"
+    "nodesoundpatch.NodeSoundMapMixin"
   ],
   "client": [
     "EnchantingTableScreenMixin"
