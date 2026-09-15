@@ -1,4 +1,4 @@
-package com.dolthhaven.doltasticenchantments.common.enchnting.tooltip;
+package com.dolthhaven.doltasticenchantments.common.enchanting.tooltip;
 
 import com.dolthhaven.doltasticenchantments.common.enchanting.graph.ConjureNodeData;
 import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
@@ -9,6 +9,8 @@ import me.alfie.immersiveenchanting.gui.tab.enchanting.node.NodeState;
 import me.alfie.immersiveenchanting.gui.tab.enchanting.tooltip.NodeTooltip;
 import net.minecraft.ChatFormatting;
 
+import static me.alfie.immersiveenchanting.api.description.DescriptionHelper.lineWrapComponent;
+
 public class ConjureLayoutExtension implements DescriptionLayoutExtension {
     @Override
     public void extendLayout(DescriptionLayout description, NodeTooltip tooltip) {
@@ -17,8 +19,9 @@ public class ConjureLayoutExtension implements DescriptionLayoutExtension {
         description.widthPadding = 16;
         int linesCreated = 0;
         if (tooltip.node().isState(NodeState.UNOBTAINED)) {
+
         } else if (tooltip.node().isState(NodeState.LOCKED)) {
-            linesCreated = DescriptionHelper.lineWrapComponent(
+            linesCreated = lineWrapComponent(
                     DoltasticEnchantments.translatable("gui.%s.tooltip.desc.conjure_hint")
                             .withStyle(ChatFormatting.GRAY),
                     DescriptionHelper.DEFAULT_LINE_WIDTH, description, 0);

@@ -7,16 +7,20 @@ import me.alfie.alfinolib.util.ResourceId;
 import me.alfie.immersiveenchanting.api.node.NodeData;
 import me.alfie.immersiveenchanting.api.node.NodePayload;
 
-public record ConjureNodeData() implements NodePayload {
+import static java.util.Objects.isNull;
+
+public record ConjureNodeData(ResourceId enchantmentId) implements NodePayload {
     public static final ResourceId TYPE = DoltasticEnchantments.rid("conjure");
+    public static final ResourceId EMPTY = DoltasticEnchantments.rid("conjure_empty");
 
     @Override
     public ResourceId type() {
         return TYPE;
     }
 
-    public static NodeData<ConjureNodeData> create() {
-        return new NodeData<>(TYPE, new ConjureNodeData(), (data, context) ->
+    public static NodeData<ConjureNodeData> create(ResourceId enchantment) {
+        ResourceId withSuffix = isNull(enchantment) ? EMPTY : new ResourceId(enchantment.namespace(), enchantment.path() + "/conjuring");
+        return new NodeData<>(TYPE, new ConjureNodeData(withSuffix), (data, context) ->
                 Networking.sendToServer(new ConjurePacket("sex")));
     }
 }

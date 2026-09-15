@@ -4,5 +4,5 @@
   "gui.doltastic_enchantments.tooltip.title.conjure": "Conjure",
   "gui.doltastic_enchantments.tooltip.desc.conjure_description": "Enchant a book with any enchantment.",
 
-  "gui.doltastic_enchantments.conjure_hint": "You must place an enchantment's reagent on the table as a focus."
+  "gui.doltastic_enchantments.tooltip.desc.conjure_hint": "You must place an enchantment's reagent on the table as a focus."
 }

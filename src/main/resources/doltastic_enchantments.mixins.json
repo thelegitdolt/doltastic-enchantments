@@ -7,7 +7,8 @@
     "AncientBookLootModifierMixin",
     "BookshelfCheckerMixin",
     "CostDatapackMixin",
-    "CreativeEventsMixin"
+    "CreativeEventsMixin",
+    "EnchantingTableMenuMixin"
   ],
   "client": [
     "EnchantingTableScreenMixin"
