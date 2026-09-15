@@ -7,6 +7,7 @@
     "AncientBookLootModifierMixin",
     "BookshelfCheckerMixin",
     "CostDatapackMixin",
+    "CostRendererMixin",
     "CreativeEventsMixin",
     "EnchantingTableMenuMixin"
   ],

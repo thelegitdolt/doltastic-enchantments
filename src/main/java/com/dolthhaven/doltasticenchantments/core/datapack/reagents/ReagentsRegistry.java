@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ReagentsRegistry {
     public static final ResourceId CONJURE_ID = DoltasticEnchantments.rid("conjure");
@@ -74,6 +75,24 @@ public class ReagentsRegistry {
             if (EnchantCostUtil.test(enchantAndCost.getValue(), stack)) {
                 return enchantAndCost.getKey();
             }
+        }
+        return null;
+    }
+
+    /**
+     * I AM NOT REWORKING MY ENTIRE MOD FOR THIS SETBACK
+     */
+    public <T> CostHolder findWithoutRegAccess(T find, Function<Holder<Enchantment>, T> interpreter) {
+        Holder<Enchantment> holder = null;
+
+        for (Holder<Enchantment> holderInReg : register.keySet()) {
+            if (interpreter.apply(holderInReg).equals(find)) {
+                holder = holderInReg;
+                break;
+            }
+        }
+        if (holder != null) {
+            return register.get(holder);
         }
         return null;
     }

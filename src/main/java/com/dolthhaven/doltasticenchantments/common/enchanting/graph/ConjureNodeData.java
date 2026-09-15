@@ -11,6 +11,7 @@ import static java.util.Objects.isNull;
 
 public record ConjureNodeData(ResourceId enchantmentId) implements NodePayload {
     public static final ResourceId TYPE = DoltasticEnchantments.rid("conjure");
+    public static final String FLAG = "/conjuring";
     public static final ResourceId EMPTY = DoltasticEnchantments.rid("conjure_empty");
 
     @Override
@@ -19,8 +20,12 @@ public record ConjureNodeData(ResourceId enchantmentId) implements NodePayload {
     }
 
     public static NodeData<ConjureNodeData> create(ResourceId enchantment) {
-        ResourceId withSuffix = isNull(enchantment) ? EMPTY : new ResourceId(enchantment.namespace(), enchantment.path() + "/conjuring");
+        ResourceId withSuffix = isNull(enchantment) ? EMPTY : new ResourceId(enchantment.namespace(), enchantment.path() + FLAG);
         return new NodeData<>(TYPE, new ConjureNodeData(withSuffix), (data, context) ->
                 Networking.sendToServer(new ConjurePacket("sex")));
+    }
+
+    public static ResourceId unwrapFlag(ResourceId id) {
+        return new ResourceId(id.namespace(), id.path().substring(0, id.path().length() - FLAG.length()));
     }
 }
