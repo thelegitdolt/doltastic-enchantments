@@ -98,7 +98,6 @@ dependencies {
     runtimeOnly ("mezz.jei:jei-${project.minecraft_version}-neoforge:${project.jei}")
 
     implementation ("maven.modrinth:emi:${project.emi}")
-    implementation ("maven.modrinth:reliable-remover:${project.rr}")
     implementation ("maven.modrinth:immersive-enchanting:${project.ie}")
     implementation ("maven.modrinth:alfinolib:${project.alfinolib}")
 }
