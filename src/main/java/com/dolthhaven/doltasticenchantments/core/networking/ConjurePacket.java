@@ -69,7 +69,6 @@ public record ConjurePacket(ResourceLocation enchantment) implements NetworkPack
                 ItemStack book = BookUtil.newBookWith(enchantRef);
                 BookUtil.drop(player, toolStack.split(toolStack.getCount() - 1));
                 menu.getToolSlot().set(book);
-                menu.getToolSlot().setChanged();
 
                 player.awardStat(Stats.ENCHANT_ITEM);
                 if (player instanceof ServerPlayer serverPlayer) {
