@@ -1,4 +1,4 @@
-package com.dolthhaven.doltasticenchantments.core.datapack;
+package com.dolthhaven.doltasticenchantments.common.enchanting;
 
 import net.minecraft.world.item.ItemStack;
 

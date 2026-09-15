@@ -10,6 +10,7 @@
     "CreativeEventsMixin"
   ],
   "client": [
+    "EnchantingTableScreenMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.0"

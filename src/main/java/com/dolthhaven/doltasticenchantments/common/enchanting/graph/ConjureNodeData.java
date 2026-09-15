@@ -8,7 +8,7 @@ import me.alfie.immersiveenchanting.api.node.NodeData;
 import me.alfie.immersiveenchanting.api.node.NodePayload;
 
 public record ConjureNodeData() implements NodePayload {
-    public static final ResourceId TYPE = DoltasticEnchantments.rid("conjuring");
+    public static final ResourceId TYPE = DoltasticEnchantments.rid("conjure");
 
     @Override
     public ResourceId type() {

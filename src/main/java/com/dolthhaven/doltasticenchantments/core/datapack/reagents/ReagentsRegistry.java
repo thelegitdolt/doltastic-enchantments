@@ -1,9 +1,11 @@
 package com.dolthhaven.doltasticenchantments.core.datapack.reagents;
 
+import com.dolthhaven.doltasticenchantments.core.DoltasticEnchantments;
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
 import me.alfie.alfinolib.datapacks.client.ClientDatapackManager;
 import me.alfie.alfinolib.datapacks.server.ServerDatapackManager;
 import me.alfie.alfinolib.networking.codec.StreamCodec;
+import me.alfie.alfinolib.util.ResourceId;
 import me.alfie.immersiveenchanting.datapack.enchantment_cost.codec.CostHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -18,7 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ReagentsRegistry {
+    public static final ResourceId CONJURE_ID = DoltasticEnchantments.rid("conjure");
+
     private Map<Holder<Enchantment>, CostHolder> register = new HashMap<>();
+
     public static final StreamCodec<RegistryFriendlyByteBuf, ReagentsRegistry> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public void encode(RegistryFriendlyByteBuf buf, ReagentsRegistry registry) {

@@ -1,11 +1,11 @@
 package com.dolthhaven.doltasticenchantments.core;
 
+import com.dolthhaven.doltasticenchantments.common.enchanting.EnchantingMenuEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.DELootRemolder;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DERecipes;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentDatapack;
-import com.dolthhaven.doltasticenchantments.core.events.EnchantingMenuEvents;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
 import com.dolthhaven.doltasticenchantments.core.registry.DEItems;
 import com.dolthhaven.doltasticenchantments.core.registry.DELoot;
@@ -16,6 +16,7 @@ import me.alfie.alfinolib.datapacks.DatapackRegistry;
 import me.alfie.alfinolib.util.ResourceId;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -47,6 +48,7 @@ public class DoltasticEnchantments {
         bus.addListener(DEPackets::register);
 
         NeoForge.EVENT_BUS.addListener(EnchantingMenuEvents::addDoltBranches);
+        bus.addListener(EnchantingMenuEvents::registerNodeExtensions);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DEItems.setUpTabEditors();
@@ -73,7 +75,7 @@ public class DoltasticEnchantments {
     }
 
 
-    public static Component translatable(String key) {
+    public static MutableComponent translatable(String key) {
         return Component.translatable(key.formatted(MOD_ID));
     }
 }
