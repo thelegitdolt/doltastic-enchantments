@@ -1,6 +1,7 @@
 package com.dolthhaven.doltasticenchantments.core.mixin;
 
 import com.dolthhaven.doltasticenchantments.core.utils.EnchantCostUtil;
+import com.dolthhaven.doltasticenchantments.integration.DEReliableRemoverCompat;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import me.alfie.alfinolib.datapacks.DatapackDefinition;
@@ -33,7 +34,8 @@ public abstract class CostDatapackMixin extends ModDatapack<CostDatapack, CostRe
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
     private void sex(@NotNull Map<ResourceLocation, JsonElement> map, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller, CallbackInfo ci) {
         EnchantmentUtil.getAllEnchantmentsInRegistry(this.getRegistryLookup()).forEach(enchantment -> {
-            this.DATA.register(ResourceId.parse(enchantment.getRegisteredName()), EnchantCostUtil.defaultCost(enchantment.value().getMaxLevel()));
+            if (!DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
+                this.DATA.register(ResourceId.parse(enchantment.getRegisteredName()), EnchantCostUtil.defaultCost(enchantment.value().getMaxLevel()));
         });
         EnchantCostUtil.DEFAULT_COUNT = null;
     }
