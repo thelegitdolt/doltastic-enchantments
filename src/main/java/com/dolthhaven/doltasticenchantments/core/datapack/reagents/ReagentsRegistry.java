@@ -97,10 +97,6 @@ public class ReagentsRegistry {
         return null;
     }
 
-    public CostHolder getUnsafe(Holder<Enchantment> enchantment) {
-        return register.get(enchantment);
-    }
-
     public CostHolder put(Holder<Enchantment> enchantment, CostHolder item) {
         return register.put(enchantment, item);
     }

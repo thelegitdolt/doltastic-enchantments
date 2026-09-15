@@ -17,14 +17,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 
-import java.util.Optional;
-
 import static java.util.Objects.isNull;
 
 public class EnchantingMenuEvents {
     public static void addDoltBranches(BuildBranchesEvent event) {
-        if (event.getStack().is(Items.EMERALD)) {
-
+        if (event.getStack().is(Items.BOOK)) {
             buildConjureBranch(event);
         }
     }

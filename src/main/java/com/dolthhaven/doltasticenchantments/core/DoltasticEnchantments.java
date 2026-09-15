@@ -3,7 +3,9 @@ package com.dolthhaven.doltasticenchantments.core;
 import com.dolthhaven.doltasticenchantments.common.enchanting.EnchantingMenuEvents;
 import com.dolthhaven.doltasticenchantments.core.data.client.DEItemsModelsGen;
 import com.dolthhaven.doltasticenchantments.core.data.server.DELootRemolder;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEBlockTags;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEEnchantmentTags;
+import com.dolthhaven.doltasticenchantments.core.data.server.tags.DEItemTags;
 import com.dolthhaven.doltasticenchantments.core.data.server.tags.DERecipes;
 import com.dolthhaven.doltasticenchantments.core.datapack.reagents.ReagentDatapack;
 import com.dolthhaven.doltasticenchantments.core.networking.DEPackets;
@@ -58,7 +60,11 @@ public class DoltasticEnchantments {
     private void dataSetup(final GatherDataEvent event) {
         DataGenerator dataGen = event.getGenerator();
         boolean server = event.includeServer();
+
+        DEBlockTags deBlockTags = new DEBlockTags(event);
         dataGen.addProvider(server, new DEEnchantmentTags(event));
+        dataGen.addProvider(server, deBlockTags);
+        dataGen.addProvider(server, new DEItemTags(event, deBlockTags.contentsGetter()));
         dataGen.addProvider(server, new DERecipes(event));
         dataGen.addProvider(server, new DELootRemolder(event));
 
