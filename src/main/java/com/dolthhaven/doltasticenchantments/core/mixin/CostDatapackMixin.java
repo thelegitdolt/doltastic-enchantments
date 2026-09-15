@@ -31,11 +31,14 @@ public abstract class CostDatapackMixin extends ModDatapack<CostDatapack, CostRe
         super(codec, definition, registryAccess);
     }
 
+    // gives every single enchantment without a cost defined the default fairy dust cost
+    // all costs added by immersive enchanting are filtered out in the pack.mcmeta file
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
-    private void sex(@NotNull Map<ResourceLocation, JsonElement> map, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller, CallbackInfo ci) {
+    private void DoltasticEnchantments$PopulateDefaultCosts(@NotNull Map<ResourceLocation, JsonElement> map, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller, CallbackInfo ci) {
         EnchantmentUtil.getAllEnchantmentsInRegistry(this.getRegistryLookup()).forEach(enchantment -> {
-            if (!DEReliableRemoverCompat.isEnchantmentRemoved(enchantment))
-                this.DATA.register(ResourceId.parse(enchantment.getRegisteredName()), EnchantCostUtil.defaultCost(enchantment.value().getMaxLevel()));
+            ResourceId enchantId = ResourceId.parse(enchantment.getRegisteredName());
+            if (this.DATA.isRegistered(enchantId))
+                this.DATA.register(enchantId, EnchantCostUtil.defaultCost(enchantment.value().getMaxLevel()));
         });
         EnchantCostUtil.DEFAULT_COUNT = null;
     }
