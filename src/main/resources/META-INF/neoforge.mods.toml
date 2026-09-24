@@ -15,28 +15,28 @@ description = '''
 
 [[dependencies.doltastic_enchantments]]
     modId = "blueprint"
-    mandatory = true
+    type = "required"
     versionRange = "[7.1.0,)"
     ordering = "AFTER"
     side = "BOTH"
 
 [[dependencies.doltastic_enchantments]]
     modId = "immersiveenchanting"
-    mandatory = true
+    type = "required"
     versionRange = "[5.0.0,)"
     ordering = "AFTER"
     side = "BOTH"
 
 [[dependencies.doltastic_enchantments]]
     modId = "emi"
-    mandatory = false
+    type = "optional"
     versionRange = "[1.1.0,)"
     ordering = "AFTER"
     side = "BOTH"
 
 [[dependencies.doltastic_enchantments]]
     modId = "reliable_remover"
-    mandatory = false
+    type = "optional"
     versionRange = "[2.0.0,)"
     ordering = "AFTER"
     side = "BOTH"

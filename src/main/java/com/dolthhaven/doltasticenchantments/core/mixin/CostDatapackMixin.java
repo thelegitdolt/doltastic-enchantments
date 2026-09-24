@@ -40,6 +40,5 @@ public abstract class CostDatapackMixin extends ModDatapack<CostDatapack, CostRe
             if (!this.DATA.isRegistered(enchantId))
                 this.DATA.register(enchantId, EnchantCostUtil.defaultCost(enchantment.value().getMaxLevel()));
         });
-        EnchantCostUtil.DEFAULT_COUNT = null;
     }
 }
