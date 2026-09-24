@@ -165,6 +165,7 @@ public class EnchantCostUtil {
     public static int[][] DEFAULT_COUNT = {
             {}, {5}, {3, 5}, {2, 3, 5}, {1, 2, 4, 5}, {1, 2, 3, 4, 5}
     };
+
     public static <E> String reduceToString(Iterable<E> list, Function<E, ?> stringFunction, String delimiter) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Iterator<E> iterator = list.iterator(); iterator.hasNext();) {

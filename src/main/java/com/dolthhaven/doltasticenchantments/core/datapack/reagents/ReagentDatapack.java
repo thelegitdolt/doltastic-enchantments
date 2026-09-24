@@ -72,8 +72,6 @@ public class ReagentDatapack extends ModDatapack<CostHolder, ReagentsRegistry> {
         }
         DoltasticEnchantments.LOGGER.info("Successfully loaded reagents for {} enchantments", reagentCount);
 
-
-//        syncWithServer();
         logUnreagentedEnchants(reagentsReg);
     }
 

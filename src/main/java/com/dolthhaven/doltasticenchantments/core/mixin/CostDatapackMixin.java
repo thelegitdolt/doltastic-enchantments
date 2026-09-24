@@ -37,7 +37,7 @@ public abstract class CostDatapackMixin extends ModDatapack<CostDatapack, CostRe
     private void DoltasticEnchantments$PopulateDefaultCosts(@NotNull Map<ResourceLocation, JsonElement> map, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller, CallbackInfo ci) {
         EnchantmentUtil.getAllEnchantmentsInRegistry(this.getRegistryLookup()).forEach(enchantment -> {
             ResourceId enchantId = ResourceId.parse(enchantment.getRegisteredName());
-            if (this.DATA.isRegistered(enchantId))
+            if (!this.DATA.isRegistered(enchantId))
                 this.DATA.register(enchantId, EnchantCostUtil.defaultCost(enchantment.value().getMaxLevel()));
         });
         EnchantCostUtil.DEFAULT_COUNT = null;
